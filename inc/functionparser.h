@@ -2,6 +2,7 @@
 #define FUNCTIONPARSER_H
 
 #include <QObject>
+#include <cassert>
 #include "exprtk.h"
 
 typedef double T; // numeric type (float, double, mpfr etc...)
@@ -20,8 +21,11 @@ signals:
 public slots:
 
 private:
+    //Table of symbolic variables (x,y,z)
     symbol_table_t *symbol_table;
+    //Parsed expression
     expression_t *expression;
+    //Parser object
     parser_t *parser;
 };
 
