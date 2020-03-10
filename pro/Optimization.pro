@@ -23,17 +23,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+INCLUDEPATH += $$PWD/../inc
 
+SRC = $$PWD/../src
+INC = $$PWD/../inc
+UI = $$PWD/../uic
+
+DESTDIR = $$PWD/..
+#OBJECTS_DIR = $$PWD/../build/obj
+#MOC_DIR = $$PWD/../build/moc
+#RCC_DIR = $$PWD/../build/rcc
+##OUT_PWD = $$PWD/../build
+#UI_DIR = $$PWD/../build/ui
 
 SOURCES += \
-        main.cpp \
-        optimizationmainwindow.cpp \
-        functionparser.cpp
+        $$SRC/main.cpp \
+        $$SRC/optimizationmainwindow.cpp \
+        $$SRC/functionparser.cpp
 
 HEADERS += \
-        optimizationmainwindow.h \
-        exprtk.h \
-        functionparser.h
+        $$INC/optimizationmainwindow.h \
+        $$INC/exprtk.h \
+        $$INC/functionparser.h
 
 FORMS += \
-        optimizationmainwindow.ui
+        $$UI/optimizationmainwindow.ui
