@@ -8,7 +8,6 @@ OptimizationMainWindow::OptimizationMainWindow(QWidget *parent) :
     ui->setupUi(this);
     this->statusBar()->showMessage("Nondominated sorting genetic Algorithm II - multiobject nonlinear optimization problem");
     this->userConnections();
-    this->parser = new FunctionParser;
 }
 
 void OptimizationMainWindow::userConnections()
@@ -91,4 +90,59 @@ void OptimizationMainWindow::on_DimButton_clicked()
         ui->n5MaxValue->setEnabled(false);
         ui->n5MinValue->setEnabled(false);
     }
+}
+
+void OptimizationMainWindow::on_AlgorithmStartButton_clicked()
+{
+    QVector<QPair<double,double>> borders;
+    QMap<QString, T> params;
+    QMap<int,QString> functions;
+    params.insert("n",ui->DimInput->value());
+    double a, b;
+    try
+        {
+        if(!ui->n1MaxValue->text().isEmpty()) b = ui->n1MaxValue->text().toDouble();
+            else if(params["n"] >= 1) throw (QString)("No Max value for first variable");
+        if(!ui->n1MinValue->text().isEmpty()) a = ui->n1MinValue->text().toDouble();
+            else if(params["n"] >= 1) throw (QString)("No Min value for first variable");
+        borders.push_back(QPair<double,double>(a,b));
+        if(!ui->n2MaxValue->text().isEmpty()) b = ui->n2MaxValue->text().toDouble();
+            else if(params["n"] >= 2) throw (QString)("No Max value for second variable");
+        if(!ui->n2MinValue->text().isEmpty()) a = ui->n2MinValue->text().toDouble();
+            else if(params["n"] >= 2) throw (QString)("No Min value for second variable");
+        borders.push_back(QPair<double,double>(a,b));
+        if(!ui->n3MaxValue->text().isEmpty()) b = ui->n3MaxValue->text().toDouble();
+            else if(params["n"] >= 3) throw (QString)("No Max value for third variable");
+        if(!ui->n3MinValue->text().isEmpty()) a = ui->n3MinValue->text().toDouble();
+            else if(params["n"] >= 3) throw (QString)("No Min value for third variable");
+        borders.push_back(QPair<double,double>(a,b));
+        if(!ui->n4MaxValue->text().isEmpty()) b = ui->n4MaxValue->text().toDouble();
+            else if(params["n"] >= 4) throw (QString)("No Max value for fourth variable");
+        if(!ui->n4MinValue->text().isEmpty()) a = ui->n4MinValue->text().toDouble();
+            else if(params["n"] >= 4) throw (QString)("No Min value for fourth variable");
+        borders.push_back(QPair<double,double>(a,b));
+        if(!ui->n5MaxValue->text().isEmpty()) b = ui->n5MaxValue->text().toDouble();
+            else if(params["n"] >= 5) throw (QString)("No Max value for fifth variable");
+        if(!ui->n5MinValue->text().isEmpty()) a = ui->n5MinValue->text().toDouble();
+            else if(params["n"] >= 5) throw (QString)("No Min value for fifth variable");
+        borders.push_back(QPair<double,double>(a,b));
+        if(!ui->LpValue->text().isEmpty()) params.insert("Lp",ui->LpValue->text().toDouble());
+            else throw (QString)("No population size Lp");
+        if(!ui->LgValue->text().isEmpty()) params.insert("Lg",ui->LgValue->text().toDouble());
+            else throw (QString)("No number of generations Lg");
+        if(!ui->PmValue->text().isEmpty()) params.insert("Lg",ui->PmValue->text().toDouble());
+            else throw (QString)("No mutation probability Pm");
+        if(!ui->PeValue->text().isEmpty()) params.insert("Lg",ui->PeValue->text().toDouble());
+            else throw (QString)("No crossing probability Pe");
+        if(!ui->FirstFunctionString->text().isEmpty()) functions.insert(1,(QString)(ui->FirstFunctionString->text()));
+            else throw (QString)("No first function given");
+        if(!ui->SecondFunctionString->text().isEmpty()) functions.insert(2,(QString)(ui->SecondFunctionString->text()));
+            else throw (QString)("No second function given");
+    }
+    catch(QString obj)
+    {
+        QMessageBox::warning(this, "Warning", obj);
+        return;
+    }
+    this->optimizationTask = new NSGAalgorithm(borders,params,functions);
 }

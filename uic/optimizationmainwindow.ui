@@ -979,7 +979,12 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="LpValue"/>
+           <widget class="QLineEdit" name="LpValue">
+            <property name="styleSheet">
+             <string notr="true">border-color: rgb(255, 255, 255);
+color: rgb(255, 255, 255);</string>
+            </property>
+           </widget>
           </item>
           <item>
            <spacer name="horizontalSpacer_32">
@@ -1006,7 +1011,12 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="LgValue"/>
+           <widget class="QLineEdit" name="LgValue">
+            <property name="styleSheet">
+             <string notr="true">border-color: rgb(255, 255, 255);
+color: rgb(255, 255, 255);</string>
+            </property>
+           </widget>
           </item>
           <item>
            <spacer name="horizontalSpacer_33">
@@ -1033,7 +1043,12 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="PeValue"/>
+           <widget class="QLineEdit" name="PeValue">
+            <property name="styleSheet">
+             <string notr="true">border-color: rgb(255, 255, 255);
+color: rgb(255, 255, 255);</string>
+            </property>
+           </widget>
           </item>
           <item>
            <spacer name="horizontalSpacer_34">
@@ -1060,7 +1075,12 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="PmValue"/>
+           <widget class="QLineEdit" name="PmValue">
+            <property name="styleSheet">
+             <string notr="true">border-color: rgb(255, 255, 255);
+color: rgb(255, 255, 255);</string>
+            </property>
+           </widget>
           </item>
           <item>
            <spacer name="horizontalSpacer_35">
