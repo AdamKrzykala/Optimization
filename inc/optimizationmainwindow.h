@@ -2,6 +2,9 @@
 #define OPTIMIZATIONMAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDebug>
+#include "authors.h"
+
 #include "functionparser.h"
 
 namespace Ui {
@@ -19,6 +22,16 @@ public:
 private:
     Ui::OptimizationMainWindow *ui;
     FunctionParser *parser;
+
+protected:
+    void closeEvent(QCloseEvent* event) override {
+        QMainWindow::closeEvent(event);
+    }
+    void userConnections();
+
+private slots:
+    void on_actionAuthors_triggered();
+    void on_DimButton_clicked();
 };
 
 #endif // OPTIMIZATIONMAINWINDOW_H

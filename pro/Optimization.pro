@@ -27,12 +27,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         optimizationmainwindow.cpp \
-    functionparser.cpp
+    functionparser.cpp \
+    nsgaalgorithm.cpp \
+    authors.cpp
 
 HEADERS += \
         optimizationmainwindow.h \
     exprtk.h \
-    functionparser.h
+    functionparser.h \
+    nsgaalgorithm.h \
+    authors.h
 
 FORMS += \
-        optimizationmainwindow.ui
+        optimizationmainwindow.ui \
+    authors.ui
+
+RESOURCES += \
+    resources.qrc
