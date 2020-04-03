@@ -212,6 +212,9 @@ font: 25 12pt &quot;Ubuntu&quot;;</string>
           </item>
           <item>
            <widget class="QLineEdit" name="n1MinValue">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">border-color: rgb(255, 255, 255);
 color: rgb(255, 255, 255);</string>
@@ -446,12 +449,15 @@ font: 25 12pt &quot;Ubuntu&quot;;</string>
           </item>
           <item>
            <widget class="QLineEdit" name="n3MinValue">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">border-color: rgb(255, 255, 255);
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>-1000</string>
+             <string>-</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -484,12 +490,15 @@ font: 25 12pt &quot;Ubuntu&quot;;</string>
           </item>
           <item>
            <widget class="QLineEdit" name="n3MaxValue">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">border-color: rgb(255, 255, 255);
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>1000</string>
+             <string>-</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -563,12 +572,15 @@ font: 25 12pt &quot;Ubuntu&quot;;</string>
           </item>
           <item>
            <widget class="QLineEdit" name="n4MinValue">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">border-color: rgb(255, 255, 255);
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>-1000</string>
+             <string>-</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -601,12 +613,15 @@ font: 25 12pt &quot;Ubuntu&quot;;</string>
           </item>
           <item>
            <widget class="QLineEdit" name="n4MaxValue">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">border-color: rgb(255, 255, 255);
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>1000</string>
+             <string>-</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -680,12 +695,15 @@ font: 25 12pt &quot;Ubuntu&quot;;</string>
           </item>
           <item>
            <widget class="QLineEdit" name="n5MinValue">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">border-color: rgb(255, 255, 255);
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>-1000</string>
+             <string>-</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -718,12 +736,15 @@ font: 25 12pt &quot;Ubuntu&quot;;</string>
           </item>
           <item>
            <widget class="QLineEdit" name="n5MaxValue">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">border-color: rgb(255, 255, 255);
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>1000</string>
+             <string>-</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>

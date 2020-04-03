@@ -8,18 +8,6 @@ OptimizationMainWindow::OptimizationMainWindow(QWidget *parent) :
     ui->setupUi(this);
     this->statusBar()->showMessage("Nondominated sorting genetic Algorithm II - multiobject nonlinear optimization problem");
     this->userConnections();
-    ui->n3MaxValue->setText("-");
-    ui->n3MinValue->setText("-");
-    ui->n3MaxValue->setEnabled(false);
-    ui->n3MinValue->setEnabled(false);
-    ui->n4MaxValue->setText("-");
-    ui->n4MinValue->setText("-");
-    ui->n4MaxValue->setEnabled(false);
-    ui->n4MinValue->setEnabled(false);
-    ui->n5MaxValue->setText("-");
-    ui->n5MinValue->setText("-");
-    ui->n5MaxValue->setEnabled(false);
-    ui->n5MinValue->setEnabled(false);
     this->parser = new FunctionParser;
 }
 
