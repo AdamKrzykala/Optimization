@@ -7,4 +7,5 @@ NSGAalgorithm::NSGAalgorithm(QVector<QPair<double,double>> borders,
 {
     this->function1 = new FunctionParser;
     this->function2 = new FunctionParser;
+    //GENERATING INITIAL POPULATION
 }
