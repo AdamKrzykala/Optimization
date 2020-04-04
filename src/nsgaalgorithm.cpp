@@ -5,7 +5,7 @@ NSGAalgorithm::NSGAalgorithm(QVector<QPair<double,double>> borders,
                              QMap<int,QString> functions,
                              QObject *parent) : QObject(parent)
 {
-    this->function1 = new FunctionParser;
-    this->function2 = new FunctionParser;
+    this->function1 = new FunctionParser(functions[1]);
+    this->function2 = new FunctionParser(functions[2]);
     //GENERATING INITIAL POPULATION
 }
