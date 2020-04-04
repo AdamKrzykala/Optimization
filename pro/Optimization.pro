@@ -9,6 +9,7 @@ CONFIG += qt
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+
 TARGET = Optimization
 TEMPLATE = app
 
@@ -22,6 +23,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+#MAKEFILE = $$PWD/../build/Makefile
 
 INCLUDEPATH += $$PWD/../inc
 
@@ -30,21 +32,16 @@ INC = $$PWD/../inc
 UI = $$PWD/../uic
 
 DESTDIR = $$PWD/..
+
+q# tutaj miały być ładnie poukładne foldery, ale szkoda mi już czasu dochodzić czemu qt mnie nie słuch
+#DESTDIR = $$PWD/../build
 #OBJECTS_DIR = $$PWD/../build/obj
 #MOC_DIR = $$PWD/../build/moc
 #RCC_DIR = $$PWD/../build/rcc
-##OUT_PWD = $$PWD/../build
 #UI_DIR = $$PWD/../build/ui
 
-SOURCES += \
-        $$SRC/main.cpp \
-        $$SRC/optimizationmainwindow.cpp \
-        $$SRC/functionparser.cpp
+SOURCES += $$SRC/*.cpp
 
-HEADERS += \
-        $$INC/optimizationmainwindow.h \
-        $$INC/exprtk.h \
-        $$INC/functionparser.h
+HEADERS += $$INC/*.h
 
-FORMS += \
-        $$UI/optimizationmainwindow.ui
+FORMS += $$UI/*.ui
