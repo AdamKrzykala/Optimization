@@ -2,7 +2,16 @@
 #define OPTIMIZATIONMAINWINDOW_H
 
 #include <QMainWindow>
-#include "functionparser.h"
+#include <QMessageBox>
+#include <QString>
+#include <QVector>
+#include <QDebug>
+#include <QPair>
+#include <QMap>
+#include "authors.h"
+#include "nsgaalgorithm.h"
+
+template <class Key, class T> class QMap;
 
 namespace Ui {
 class OptimizationMainWindow;
@@ -18,7 +27,18 @@ public:
 
 private:
     Ui::OptimizationMainWindow *ui;
-    FunctionParser *parser;
+    NSGAalgorithm *optimizationTask;
+
+protected:
+    inline void closeEvent(QCloseEvent* event) override {
+        QMainWindow::closeEvent(event);
+    }
+    void userConnections();
+
+private slots:
+    void on_actionAuthors_triggered();
+    void on_DimButton_clicked();
+    void on_AlgorithmStartButton_clicked();
 };
 
 #endif // OPTIMIZATIONMAINWINDOW_H

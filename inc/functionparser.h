@@ -2,6 +2,7 @@
 #define FUNCTIONPARSER_H
 
 #include <QObject>
+#include <QVector>
 #include <cassert>
 #include "exprtk.h"
 
@@ -14,7 +15,8 @@ class FunctionParser : public QObject
 {
     Q_OBJECT
 public:
-    explicit FunctionParser(QObject *parent = nullptr);
+    explicit FunctionParser(QString, QObject *parent = nullptr);
+    T getValue(QVector<T>);
 
 signals:
 
@@ -27,6 +29,8 @@ private:
     expression_t *expression;
     //Parser object
     parser_t *parser;
+    //x vector
+    QVector<T> x = {0,0,0,0,0};
 };
 
 #endif // FUNCTIONPARSER_H
