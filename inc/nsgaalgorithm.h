@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QPair>
 #include <QMap>
+#include <random>
 
 #include "functionparser.h"
 
@@ -23,6 +24,8 @@ public slots:
 private:
     FunctionParser *function1;
     FunctionParser *function2;
+    QVector<QVector<T>> population;
+    QMap<QString,T> params;
 };
 
 #endif // NSGAALGORITHM_H
