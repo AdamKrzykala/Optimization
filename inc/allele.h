@@ -19,9 +19,9 @@ class Allele : public QObject
 public:
     explicit    Allele(QObject *parent = nullptr);
 
-    Population                    initPopulation( QMap<QString,T> params, QVector<QPair<double,double>> borders );
-    QVector<QPair<QString, int>>  populationToBin( Population population, double lLimit, double rLimit );
-    Population                    binToPopulation( QVector<QPair<QString, int>> temp_population, double lLimit, double rLimit );
+    Population                    initPopulation( QMap<QString, T> &params, QVector<QPair<double,double>> borders );
+    QVector<QPair<QString, int>>  populationToBin( Population population, QVector<QPair<double,double>> borders);
+    Population                    binToPopulation( QVector<QPair<QString, int>> temp_population, QVector<QPair<double,double>> borders );
 signals:
 
 public slots:
