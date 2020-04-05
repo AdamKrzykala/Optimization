@@ -9,7 +9,8 @@
 #include <QMap>
 #include <random>
 
-#include "functionparser.h"
+#include "allele.h"
+//#include "functionparser.h"
 
 class NSGAalgorithm : public QObject
 {
@@ -24,8 +25,9 @@ public slots:
 private:
     FunctionParser *function1;
     FunctionParser *function2;
-    QVector<QVector<T>> population;
-    QMap<QString,T> params;
+    Population _current;
+    QMap<QString,T> _params;
+
 };
 
 #endif // NSGAALGORITHM_H

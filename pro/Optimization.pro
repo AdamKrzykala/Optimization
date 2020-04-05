@@ -30,6 +30,7 @@ INCLUDEPATH += $$PWD/../inc
 SRC = $$PWD/../src
 INC = $$PWD/../inc
 UI = $$PWD/../uic
+RSC = $$PWD/../res
 
 DESTDIR = $$PWD/..
 
@@ -45,3 +46,5 @@ SOURCES += $$SRC/*.cpp
 HEADERS += $$INC/*.h
 
 FORMS += $$UI/*.ui
+
+RESOURCES += $$RSC/*.qrc
