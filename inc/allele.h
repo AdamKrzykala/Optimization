@@ -24,9 +24,11 @@ class Allele : public QObject
 public:
     explicit    Allele(Parameters _params, QObject *parent = nullptr);
 
-    Population      initPopulation( QMap<QString, T> &params, QVector<QPair<double,double>> borders );
-    PopulationBin   populationToBin( Population population, QVector<QPair<double,double>> borders);
-    Population      binToPopulation( QVector<QPair<QString, int>> temp_population, QVector<QPair<double,double>> borders );
+    Population      initPopulation(QVector<QPair<double,double>> borders);
+    PopulationBin   populationToBin( Population population,
+                                     QVector<QPair<double,double>> borders);
+    Population      binToPopulation( QVector<QPair<QString, int>> temp_population,
+                                     QVector<QPair<double,double>> borders );
     PopulationBin   crossing(PopulationBin parentPopulation);
     PopulationBin   mutation(PopulationBin offspringPopulation);
 

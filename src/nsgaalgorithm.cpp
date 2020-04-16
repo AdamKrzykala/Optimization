@@ -15,7 +15,7 @@ NSGAalgorithm::NSGAalgorithm(QVector< QPair< double, double >> borders,
     this->function2 = new FunctionParser(functions[2]);
     this->genetic_functions = new Allele(params);
     //Initial Population Creating
-    this->_current = this->genetic_functions->initPopulation(this->_params,this->_borders);
+    this->_current = this->genetic_functions->initPopulation(this->_borders);
 }
 
 NSGAalgorithm::~NSGAalgorithm()

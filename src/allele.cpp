@@ -5,17 +5,17 @@ Allele::Allele(Parameters params, QObject *parent) : QObject(parent)
     this->_params = params;
 }
 
-Population Allele::initPopulation( QMap<QString, T> &params, QVector<QPair<double,double>> borders )
+Population Allele::initPopulation(QVector<QPair<double,double>> borders )
 {
-    QVector<T> temp_vect(params["n"], 0.0);
-    QVector<QVector<T>>temp_population(params["Lp"], temp_vect);
+    QVector<T> temp_vect(this->_params["n"], 0.0);
+    QVector<QVector<T>>temp_population(this->_params["Lp"], temp_vect);
 
     std::random_device rd;                                              //Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd());                                             //Standard mersenne_twister_engine seeded with rd()
 
-    for(int j = 0; j < params["n"]; j++){
+    for(int j = 0; j < this->_params["n"]; j++){
         std::uniform_real_distribution<> dis(borders[j].first,borders[j].second);
-            for (int i = 0; i < params["Lp"]; i++) {
+            for (int i = 0; i < this->_params["Lp"]; i++) {
                 temp_population[i][j] = dis(gen);
             }
     }
