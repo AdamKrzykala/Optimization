@@ -16,7 +16,10 @@ class NSGAalgorithm : public QObject
 {
     Q_OBJECT
 public:
-    explicit NSGAalgorithm(QVector<QPair<double,double>>,QMap<QString,T>,QMap<int,QString>, QObject *parent = nullptr);
+    explicit NSGAalgorithm(QVector<QPair<double,double>>,
+                           QMap<QString,T>,
+                           QMap<int,QString>,
+                           QObject *parent = nullptr);
 
 signals:
 
@@ -25,8 +28,10 @@ public slots:
 private:
     FunctionParser *function1;
     FunctionParser *function2;
+    Allele *genetic_functions;
     Population _current;
-    QMap<QString,T> _params;
+    Parameters _params;
+    Borders _borders;
 
 };
 

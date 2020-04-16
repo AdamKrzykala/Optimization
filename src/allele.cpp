@@ -19,7 +19,6 @@ Population Allele::initPopulation( QMap<QString, T> &params, QVector<QPair<doubl
                 temp_population[i][j] = dis(gen);
             }
     }
-
     return temp_population;
 }
 
@@ -79,12 +78,10 @@ QVector<QPair<QString, int>> Allele::populationToBin( Population population, QVe
             temp_gen.setNum(temp_val, 2);
 
             int loop_length = b - temp_gen.size();
-
             for(int k = 0; k < loop_length; k++ )
             {
                 temp_gen.prepend('0');
             }
-
             chromosome.append(temp_gen);
         }
         temp_population.append(QPair<QString,int>(chromosome,b));

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMap>
 #include <QVector>
+#include <QDebug>
 
 #include <random>
 #include <iostream>
@@ -12,6 +13,8 @@
 #include "functionparser.h"
 
 typedef QVector<QVector<T>> Population;
+typedef QMap<QString,T> Parameters;
+typedef QVector< QPair< double, double >> Borders;
 
 class Allele : public QObject
 {
