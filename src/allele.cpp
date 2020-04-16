@@ -1,21 +1,21 @@
 #include "allele.h"
 
-Allele::Allele(QObject *parent) : QObject(parent)
+Allele::Allele(Parameters params, QObject *parent) : QObject(parent)
 {
-
+    this->_params = params;
 }
 
-Population Allele::initPopulation( QMap<QString, T> &params, QVector<QPair<double,double>> borders )
+Population Allele::initPopulation(QVector<QPair<double,double>> borders )
 {
-    QVector<T> temp_vect(params["n"], 0.0);
-    QVector<QVector<T>>temp_population(params["Lp"], temp_vect);
+    QVector<T> temp_vect(this->_params["n"], 0.0);
+    QVector<QVector<T>>temp_population(this->_params["Lp"], temp_vect);
 
     std::random_device rd;                                              //Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd());                                             //Standard mersenne_twister_engine seeded with rd()
 
-    for(int j = 0; j < params["n"]; j++){
+    for(int j = 0; j < this->_params["n"]; j++){
         std::uniform_real_distribution<> dis(borders[j].first,borders[j].second);
-            for (int i = 0; i < params["Lp"]; i++) {
+            for (int i = 0; i < this->_params["Lp"]; i++) {
                 temp_population[i][j] = dis(gen);
             }
     }
@@ -81,6 +81,28 @@ Descendant Allele::cross2Parents( QString firstParent, QString secondParent, T c
     return des;
 }
 
+QString Allele::mutateOne(QString chosenOne, double pm)
+{
+    QString mutatedOne = chosenOne;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    std::uniform_real_distribution<> dis(0, 1);
+
+    for( int i = 0 ; i < chosenOne.length(); i++ )
+    {
+        if( dis(gen) <= pm )
+        {
+            if( chosenOne.at(i) == '0'){
+                mutatedOne.replace( i, '1' );
+            }else mutatedOne.replace( i, '0');
+        }
+    }
+
+    return mutatedOne;
+}
+
 QVector<QPair<QString, int>> Allele::populationToBin( Population population, QVector<QPair<double,double>> borders)
 {
     int res = 4;                                     // coding resolution
@@ -119,3 +141,12 @@ QVector<QPair<QString, int>> Allele::populationToBin( Population population, QVe
     return temp_population;
 }
 
+PopulationBin Allele::crossing(PopulationBin parentPopulation)
+{
+    return parentPopulation;
+}
+
+PopulationBin Allele::mutation(PopulationBin offspringPopulation)
+{
+    return offspringPopulation;
+}
