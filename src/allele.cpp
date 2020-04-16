@@ -34,6 +34,8 @@ Population Allele::binToPopulation( QVector<QPair<QString, int>> temp_population
         bool con_flag;                                      // flag of conversion from binary to decimal
         QVector<T> chromosome_b10;
 
+        int j = 0;
+
         while(1)
         {
             QString gene_b2 = chromosome_b2.mid(0, bits);
@@ -42,10 +44,11 @@ Population Allele::binToPopulation( QVector<QPair<QString, int>> temp_population
 
             if(!con_flag) throw QString("Conversion from binary to longlong was not succesful");
 
-            T temp_gene = (gene/pow(10,4))+borders.at(i).first;
+            T temp_gene = (gene/pow(10,4))+borders.at(j).first;
             chromosome_b10.append(temp_gene);
 
             if(!chromosome_b2.size()) break;
+            ++j;
         }
     decoded_population.append(chromosome_b10);
     }
@@ -74,7 +77,7 @@ QVector<QPair<QString, int>> Allele::populationToBin( Population population, QVe
             QString temp_gen;
             qlonglong temp_val;
 
-            temp_val = static_cast<qlonglong>((population.at(i).at(j)-borders.at(i).first)*(static_cast<double>(pow(10,res))));
+            temp_val = static_cast<qlonglong>((population.at(i).at(j)-borders.at(j).first)*(static_cast<double>(pow(10,res))));
             temp_gen.setNum(temp_val, 2);
 
             int loop_length = b - temp_gen.size();
