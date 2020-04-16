@@ -1,25 +1,34 @@
 #include "nsgaalgorithm.h"
+#include "ui_nsgaalgorithm.h"
 
-NSGAalgorithm::NSGAalgorithm(QVector<QPair<double,double>> borders,
-                             QMap<QString,T> params,
-                             QMap<int,QString> functions,
-                             QObject *parent) : QObject(parent)
+NSGAalgorithm::NSGAalgorithm(QVector< QPair< double, double >> borders,
+                               QMap< QString, T > params,
+                               QMap< int, QString > functions,
+                               QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::NSGAalgorithm)
 {
-    this->params = params;
+    ui->setupUi(this);
+    this->_params = params;
+    this->_borders = borders;
     this->function1 = new FunctionParser(functions[1]);
     this->function2 = new FunctionParser(functions[2]);
+    this->genetic_functions = new Allele(params);
+    //Initial Population Creating
+    this->_current = this->genetic_functions->initPopulation(this->_params,this->_borders);
+}
 
-    //GENERATING INITIAL POPULATION
-    QVector<T> temp_vect(this->params["n"], 0.0);
-    QVector<QVector<T>>temp_population(this->params["Lp"], temp_vect);
-    this->population = temp_population;
-    std::random_device rd;  //Will be used to obtain a seed for the random number engine
-    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-    for(int j = 0; j < this->params["n"]; j++){
-        std::uniform_real_distribution<> dis(borders[j].first,borders[j].second);
-            for (int i = 0; i < this->params["Lp"]; i++) {
-                this->population[i][j] = dis(gen);
-            }
+NSGAalgorithm::~NSGAalgorithm()
+{
+    delete ui;
+}
+
+void NSGAalgorithm::NSGA_MainLoop(void)
+{
+    int do_iter = this->_params["Lg"];
+    while(do_iter)
+    {
+        //Main Process
+        --do_iter;
     }
-    //-----------------------------
 }

@@ -900,6 +900,9 @@ color: rgb(255, 255, 255);</string>
              <string notr="true">border-color: rgb(255, 255, 255);
 color: rgb(255, 255, 255);</string>
             </property>
+            <property name="text">
+             <string>x1^2+x2^2+x3^2+x4^2+x5^2</string>
+            </property>
            </widget>
           </item>
           <item>
@@ -907,6 +910,9 @@ color: rgb(255, 255, 255);</string>
             <property name="styleSheet">
              <string notr="true">border-color: rgb(255, 255, 255);
 color: rgb(255, 255, 255);</string>
+            </property>
+            <property name="text">
+             <string>x1^2+x2^2+x3^2+x4^2+x5^2</string>
             </property>
            </widget>
           </item>
@@ -984,6 +990,9 @@ color: rgb(255, 255, 255);</string>
              <string notr="true">border-color: rgb(255, 255, 255);
 color: rgb(255, 255, 255);</string>
             </property>
+            <property name="text">
+             <string>1000</string>
+            </property>
            </widget>
           </item>
           <item>
@@ -1015,6 +1024,9 @@ color: rgb(255, 255, 255);</string>
             <property name="styleSheet">
              <string notr="true">border-color: rgb(255, 255, 255);
 color: rgb(255, 255, 255);</string>
+            </property>
+            <property name="text">
+             <string>1</string>
             </property>
            </widget>
           </item>
@@ -1048,6 +1060,9 @@ color: rgb(255, 255, 255);</string>
              <string notr="true">border-color: rgb(255, 255, 255);
 color: rgb(255, 255, 255);</string>
             </property>
+            <property name="text">
+             <string>1</string>
+            </property>
            </widget>
           </item>
           <item>
@@ -1079,6 +1094,9 @@ color: rgb(255, 255, 255);</string>
             <property name="styleSheet">
              <string notr="true">border-color: rgb(255, 255, 255);
 color: rgb(255, 255, 255);</string>
+            </property>
+            <property name="text">
+             <string>1</string>
             </property>
            </widget>
           </item>

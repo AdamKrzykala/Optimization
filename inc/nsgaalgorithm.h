@@ -9,23 +9,34 @@
 #include <QMap>
 #include <random>
 
-#include "functionparser.h"
+#include "allele.h"
+//#include "functionparser.h"
 
-class NSGAalgorithm : public QObject
+namespace Ui {
+class NSGAalgorithm;
+}
+
+class NSGAalgorithm : public QMainWindow
 {
     Q_OBJECT
+
 public:
-    explicit NSGAalgorithm(QVector<QPair<double,double>>,QMap<QString,T>,QMap<int,QString>, QObject *parent = nullptr);
+    explicit NSGAalgorithm(QVector<QPair<double,double>>,
+                            QMap<QString,T>,
+                            QMap<int,QString>,
+                            QWidget *parent = 0);
+    ~NSGAalgorithm();
 
-signals:
-
-public slots:
+    void NSGA_MainLoop(void);
 
 private:
+    Ui::NSGAalgorithm *ui;
     FunctionParser *function1;
     FunctionParser *function2;
-    QVector<QVector<T>> population;
-    QMap<QString,T> params;
+    Allele *genetic_functions;
+    Population _current;
+    Parameters _params;
+    Borders _borders;
 };
 
 #endif // NSGAALGORITHM_H
