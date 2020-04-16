@@ -29,6 +29,11 @@ void NSGAalgorithm::NSGA_MainLoop(void)
     while(do_iter)
     {
         //Main Process
+        PopulationBin parentPopulation = this->genetic_functions->populationToBin(this->_current,
+                                                                                  this->_borders);
+        //---Creating offspring population
+        PopulationBin crossedPopulation = this->genetic_functions->crossing(parentPopulation);
+        PopulationBin offspringPopulation = this->genetic_functions->mutation(crossedPopulation);
         --do_iter;
     }
 }

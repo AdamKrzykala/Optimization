@@ -93,3 +93,12 @@ QVector<QPair<QString, int>> Allele::populationToBin( Population population, QVe
     return temp_population;
 }
 
+PopulationBin Allele::crossing(PopulationBin parentPopulation)
+{
+    return parentPopulation;
+}
+
+PopulationBin Allele::mutation(PopulationBin offspringPopulation)
+{
+    return offspringPopulation;
+}
