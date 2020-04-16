@@ -55,6 +55,32 @@ Population Allele::binToPopulation( QVector<QPair<QString, int>> temp_population
     return decoded_population;
 }
 
+Descendant Allele::cross2Parents( QString firstParent, QString secondParent, T cross_lvl )
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    std::uniform_real_distribution<> dis(0, 1);
+
+    Descendant des;
+    double s;
+
+    for( int i = 0 ; i < firstParent.length() ; i++ )
+    {
+        s = dis(gen);
+        if( s <= cross_lvl ){
+            des._descendantOne.append(firstParent.at(i));
+            des._descendantTwo.append(secondParent.at(i));
+        }else
+        {
+            des._descendantOne.append(secondParent.at(i));
+            des._descendantTwo.append(firstParent.at(i));
+        }
+    }
+
+    return des;
+}
+
 QVector<QPair<QString, int>> Allele::populationToBin( Population population, QVector<QPair<double,double>> borders)
 {
     int res = 4;                                     // coding resolution
