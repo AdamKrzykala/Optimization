@@ -145,4 +145,7 @@ void OptimizationMainWindow::on_AlgorithmStartButton_clicked()
         return;
     }
     this->optimizationTask = new NSGAalgorithm(borders,params,functions);
+    this->optimizationTask->setAttribute(Qt::WA_DeleteOnClose);
+    this->optimizationTask->showMaximized();
+    this->optimizationTask->NSGA_MainLoop();
 }

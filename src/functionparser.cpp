@@ -1,5 +1,4 @@
 #include "functionparser.h"
-#include <QDebug>
 
 QVector<std::string>X = {"x1","x2","x3","x4","x5"};
 

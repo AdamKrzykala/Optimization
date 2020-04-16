@@ -12,27 +12,25 @@
 #include "allele.h"
 //#include "functionparser.h"
 
-class NSGAalgorithm : public QObject
+namespace Ui {
+class NSGAalgorithm;
+}
+
+class NSGAalgorithm : public QMainWindow
 {
     Q_OBJECT
+
 public:
     explicit NSGAalgorithm(QVector<QPair<double,double>>,
-                           QMap<QString,T>,
-                           QMap<int,QString>,
-                           QObject *parent = nullptr);
+                            QMap<QString,T>,
+                            QMap<int,QString>,
+                            QWidget *parent = 0);
+    ~NSGAalgorithm();
 
-    virtual ~NSGAalgorithm(){
-        delete this->function1;
-        delete this->function2;
-        delete this->genetic_functions;
-    }
     void NSGA_MainLoop(void);
 
-signals:
-
-public slots:
-
 private:
+    Ui::NSGAalgorithm *ui;
     FunctionParser *function1;
     FunctionParser *function2;
     Allele *genetic_functions;
