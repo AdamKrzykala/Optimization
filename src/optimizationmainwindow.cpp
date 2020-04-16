@@ -130,9 +130,9 @@ void OptimizationMainWindow::on_AlgorithmStartButton_clicked()
             else throw (QString)("No population size Lp");
         if(!ui->LgValue->text().isEmpty()) params.insert("Lg",ui->LgValue->text().toDouble());
             else throw (QString)("No number of generations Lg");
-        if(!ui->PmValue->text().isEmpty()) params.insert("Lg",ui->PmValue->text().toDouble());
+        if(!ui->PmValue->text().isEmpty()) params.insert("Pm",ui->PmValue->text().toDouble());
             else throw (QString)("No mutation probability Pm");
-        if(!ui->PeValue->text().isEmpty()) params.insert("Lg",ui->PeValue->text().toDouble());
+        if(!ui->PeValue->text().isEmpty()) params.insert("Pe",ui->PeValue->text().toDouble());
             else throw (QString)("No crossing probability Pe");
         if(!ui->FirstFunctionString->text().isEmpty()) functions.insert(1,(QString)(ui->FirstFunctionString->text()));
             else throw (QString)("No first function given");

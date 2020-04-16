@@ -1,8 +1,8 @@
 #include "allele.h"
 
-Allele::Allele(QObject *parent) : QObject(parent)
+Allele::Allele(Parameters params, QObject *parent) : QObject(parent)
 {
-
+    this->_params = params;
 }
 
 Population Allele::initPopulation( QMap<QString, T> &params, QVector<QPair<double,double>> borders )

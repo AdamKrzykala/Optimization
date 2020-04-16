@@ -21,6 +21,13 @@ public:
                            QMap<int,QString>,
                            QObject *parent = nullptr);
 
+    virtual ~NSGAalgorithm(){
+        delete this->function1;
+        delete this->function2;
+        delete this->genetic_functions;
+    }
+    void NSGA_MainLoop(void);
+
 signals:
 
 public slots:
@@ -32,7 +39,6 @@ private:
     Population _current;
     Parameters _params;
     Borders _borders;
-
 };
 
 #endif // NSGAALGORITHM_H
