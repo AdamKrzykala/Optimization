@@ -34,7 +34,9 @@ private:
     FunctionParser *function1;
     FunctionParser *function2;
     Allele *genetic_functions;
-    Population _current;
+    Population _parentPopulation;
+    Population _offspringPopulation;
+    Population _concatenatedPopulation;
     Parameters _params;
     Borders _borders;
 };

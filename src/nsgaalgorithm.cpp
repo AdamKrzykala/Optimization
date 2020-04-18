@@ -15,13 +15,13 @@ NSGAalgorithm::NSGAalgorithm(QVector< QPair< double, double >> borders,
     this->function2 = new FunctionParser(functions[2]);
     this->genetic_functions = new Allele(params);
     //Initial Population Creating
-    this->_current = this->genetic_functions->initPopulation(this->_borders);
-    qDebug() << this->_current;
-    PopulationBin tempBin = this->genetic_functions->populationToBin(this->_current,this->_borders);
-    qDebug() << tempBin;
-    Population temp = this->genetic_functions->binToPopulation(tempBin,this->_borders);
-    qDebug() << temp;
-
+    this->_parentPopulation = this->genetic_functions->initPopulation(this->_borders);
+    PopulationBin temp = this->genetic_functions->populationToBin(this->_parentPopulation,
+                                                                  this->_borders);
+    qDebug() << "Parents: " << temp;
+    Descendant tempDes = this->genetic_functions->cross2Parents(temp[0],temp[1]);
+    qDebug() << "First descendant: " << tempDes._descendantOne;
+    qDebug() << "Second descendant: " << tempDes._descendantTwo;
 }
 
 NSGAalgorithm::~NSGAalgorithm()

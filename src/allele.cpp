@@ -103,31 +103,42 @@ Population Allele::binToPopulation( PopulationBin populationBin,
     return decoded_population;
 }
 
-//Descendant Allele::cross2Parents( QString firstParent, QString secondParent, T cross_lvl )
-//{
-//    std::random_device rd;
-//    std::mt19937 gen(rd());
+Descendant Allele::cross2Parents(IndividualBin firstParent, IndividualBin secondParent)
+{
+    double cross_prob = this->_params["Pe"];
+    GenotypeBin firstParentGenotype = firstParent.first;
+    GenotypeBin secondParentGenotype = secondParent.first;
+    if (firstParentGenotype.second != secondParentGenotype.second)
+        throw QString ("Unexpected dimension");
+    int allelDimension = firstParentGenotype.second;
 
-//    std::uniform_real_distribution<> dis(0, 1);
 
-//    Descendant des;
-//    double s;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis( 0, 1 );
 
-//    for( int i = 0 ; i < firstParent.length() ; i++ )
-//    {
-//        s = dis(gen);
-//        if( s <= cross_lvl ){
-//            des._descendantOne.append(firstParent.at(i));
-//            des._descendantTwo.append(secondParent.at(i));
-//        }else
-//        {
-//            des._descendantOne.append(secondParent.at(i));
-//            des._descendantTwo.append(firstParent.at(i));
-//        }
-//    }
-
-//    return des;
-//}
+    Descendant newDescendant;
+    static Adaptation temp_adaptation;
+    temp_adaptation.insert("rank",0.0);
+    temp_adaptation.insert("crowding",0.0);
+    newDescendant._descendantOne = IndividualBin(firstParentGenotype,temp_adaptation);
+    newDescendant._descendantTwo = IndividualBin(secondParentGenotype,temp_adaptation);
+    for (int i = 0; i < firstParentGenotype.first.size()/allelDimension; i++)
+    {
+        int start_pos = i*allelDimension+1;
+        if(dis(gen) < cross_prob){
+            newDescendant._descendantOne.first.first.replace(start_pos,
+                                                             allelDimension,
+                                                             secondParentGenotype.first.mid(start_pos,allelDimension));
+        }
+        if(dis(gen) < cross_prob){
+            newDescendant._descendantTwo.first.first.replace(start_pos,
+                                                             allelDimension,
+                                                             firstParentGenotype.first.mid(start_pos,allelDimension));
+        }
+    }
+    return newDescendant;
+}
 
 //QString Allele::mutateOne(QString chosenOne, double pm)
 //{

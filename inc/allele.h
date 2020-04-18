@@ -28,8 +28,8 @@
     typedef QVector< IndividualBin > PopulationBin;
 
 typedef struct descendant{
-    QString _descendantOne;
-    QString _descendantTwo;
+    IndividualBin _descendantOne;
+    IndividualBin _descendantTwo;
 } Descendant;
 
 class Allele : public QObject
@@ -47,7 +47,7 @@ public:
 //    PopulationBin   crossing(PopulationBin parentPopulation);
 //    PopulationBin   mutation(PopulationBin offspringPopulation);
 
-//    Descendant      cross2Parents( QString firstParent, QString secondParent, T cross_lvl );
+    Descendant      cross2Parents( IndividualBin firstParent, IndividualBin secondParent );
 //    QString         mutateOne( QString chosenOne, double pm);
 
 private:
