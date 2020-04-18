@@ -13,10 +13,19 @@
 #include "functionparser.h"
 
 //Population, parameters and borders typedef
-typedef QVector<QVector<T>> Population;
-typedef QVector<QPair<QString, int>> PopulationBin;
-typedef QMap<QString,T> Parameters;
-typedef QVector< QPair< double, double >> Borders;
+    typedef QMap< QString, double > Adaptation;
+    typedef QMap< QString, T > Parameters;
+    typedef QVector< QPair< double, double >> Borders;
+
+//Structures for decymal Population
+    typedef QVector< T > Genotype;
+    typedef QPair< Genotype, Adaptation > Individual;
+    typedef QVector< Individual > Population;
+
+//Structures for binary Population
+    typedef QPair< QString, int > GenotypeBin;
+    typedef QPair< GenotypeBin, Adaptation > IndividualBin;
+    typedef QVector< IndividualBin > PopulationBin;
 
 typedef struct descendant{
     QString _descendantOne;
@@ -29,16 +38,17 @@ class Allele : public QObject
 public:
     explicit    Allele(Parameters _params, QObject *parent = nullptr);
 
-    Population      initPopulation(QVector<QPair<double,double>> borders);
-    PopulationBin   populationToBin( Population population,
-                                     QVector<QPair<double,double>> borders);
-    Population      binToPopulation( QVector<QPair<QString, int>> temp_population,
-                                     QVector<QPair<double,double>> borders );
-    PopulationBin   crossing(PopulationBin parentPopulation);
-    PopulationBin   mutation(PopulationBin offspringPopulation);
+    Population      initPopulation( Borders borders);
 
-    Descendant      cross2Parents( QString firstParent, QString secondParent, T cross_lvl );
-    QString         mutateOne( QString chosenOne, double pm);
+    PopulationBin   populationToBin( Population population,
+                                     Borders borders);
+    Population      binToPopulation( PopulationBin populationBin,
+                                     Borders borders );
+//    PopulationBin   crossing(PopulationBin parentPopulation);
+//    PopulationBin   mutation(PopulationBin offspringPopulation);
+
+//    Descendant      cross2Parents( QString firstParent, QString secondParent, T cross_lvl );
+//    QString         mutateOne( QString chosenOne, double pm);
 
 private:
     Parameters _params;

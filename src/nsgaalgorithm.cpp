@@ -16,6 +16,12 @@ NSGAalgorithm::NSGAalgorithm(QVector< QPair< double, double >> borders,
     this->genetic_functions = new Allele(params);
     //Initial Population Creating
     this->_current = this->genetic_functions->initPopulation(this->_borders);
+    qDebug() << this->_current;
+    PopulationBin tempBin = this->genetic_functions->populationToBin(this->_current,this->_borders);
+    qDebug() << tempBin;
+    Population temp = this->genetic_functions->binToPopulation(tempBin,this->_borders);
+    qDebug() << temp;
+
 }
 
 NSGAalgorithm::~NSGAalgorithm()
@@ -23,17 +29,17 @@ NSGAalgorithm::~NSGAalgorithm()
     delete ui;
 }
 
-void NSGAalgorithm::NSGA_MainLoop(void)
-{
-    int do_iter = this->_params["Lg"];
-    while(do_iter)
-    {
-        //Main Process
-        PopulationBin parentPopulation = this->genetic_functions->populationToBin(this->_current,
-                                                                                  this->_borders);
-        //---Creating offspring population
-        PopulationBin crossedPopulation = this->genetic_functions->crossing(parentPopulation);
-        PopulationBin offspringPopulation = this->genetic_functions->mutation(crossedPopulation);
-        --do_iter;
-    }
-}
+//void NSGAalgorithm::NSGA_MainLoop(void)
+//{
+//    int do_iter = this->_params["Lg"];
+//    while(do_iter)
+//    {
+//        //Main Process
+//        PopulationBin parentPopulation = this->genetic_functions->populationToBin(this->_current,
+//                                                                                  this->_borders);
+//        //---Creating offspring population
+//        PopulationBin crossedPopulation = this->genetic_functions->crossing(parentPopulation);
+//        PopulationBin offspringPopulation = this->genetic_functions->mutation(crossedPopulation);
+//        --do_iter;
+//    }
+//}
