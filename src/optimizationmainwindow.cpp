@@ -128,6 +128,7 @@ void OptimizationMainWindow::on_AlgorithmStartButton_clicked()
         borders.push_back(QPair<double,double>(a,b));
         if(!ui->LpValue->text().isEmpty()) params.insert("Lp",ui->LpValue->text().toDouble());
             else throw (QString)("No population size Lp");
+        if((int)(params["Lp"]) % 4 != 0) throw (QString)("Population must be divisible by 4");
         if(!ui->LgValue->text().isEmpty()) params.insert("Lg",ui->LgValue->text().toDouble());
             else throw (QString)("No number of generations Lg");
         if(!ui->PmValue->text().isEmpty()) params.insert("Pm",ui->PmValue->text().toDouble());

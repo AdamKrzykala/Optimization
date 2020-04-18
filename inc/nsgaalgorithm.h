@@ -8,7 +8,6 @@
 #include <QPair>
 #include <QMap>
 #include <random>
-
 #include "allele.h"
 //#include "functionparser.h"
 
@@ -36,7 +35,6 @@ private:
     Allele *genetic_functions;
     Population _parentPopulation;
     Population _offspringPopulation;
-    Population _concatenatedPopulation;
     Parameters _params;
     Borders _borders;
 };

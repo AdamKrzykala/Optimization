@@ -44,12 +44,15 @@ public:
                                      Borders borders);
     Population      binToPopulation( PopulationBin populationBin,
                                      Borders borders );
-//    PopulationBin   crossing(PopulationBin parentPopulation);
-//    PopulationBin   mutation(PopulationBin offspringPopulation);
+    PopulationBin   crossing(PopulationBin parentPopulation);
+    PopulationBin   mutation(PopulationBin offspringPopulation);
 
-    Descendant      cross2Parents( IndividualBin firstParent, IndividualBin secondParent );
-//    QString         mutateOne( QString chosenOne, double pm);
+    Descendant      cross2Parents( IndividualBin firstParent,
+                                   IndividualBin secondParent );
+    IndividualBin   choose1Parent( PopulationBin parentPopulation);
 
+    Population      offspringPopulation( Population parentPopulation,
+                                         Borders borders);
 private:
     Parameters _params;
 

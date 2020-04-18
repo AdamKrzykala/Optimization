@@ -140,34 +140,73 @@ Descendant Allele::cross2Parents(IndividualBin firstParent, IndividualBin second
     return newDescendant;
 }
 
-//QString Allele::mutateOne(QString chosenOne, double pm)
-//{
-//    QString mutatedOne = chosenOne;
+//Tournament Selection Function
+IndividualBin   Allele::choose1Parent( PopulationBin parentPopulation)
+{
+    IndividualBin temp_parent;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis( 0, parentPopulation.size() );
+    IndividualBin firstCandidate = parentPopulation[floor(dis(gen))];
+    IndividualBin secondCandidate = parentPopulation[floor(dis(gen))];
 
-//    std::random_device rd;
-//    std::mt19937 gen(rd());
+    if (firstCandidate.second["rank"] > secondCandidate.second["rank"])
+        return firstCandidate;
+    else if (firstCandidate.second["rank"] < secondCandidate.second["rank"])
+        return secondCandidate;
+    else {
+        if (firstCandidate.second["crowding"] > secondCandidate.second["crowding"])
+            return firstCandidate;
+        else if (firstCandidate.second["crowding"] < secondCandidate.second["crowding"])
+            return secondCandidate;
+    }
+    return firstCandidate;
+}
 
-//    std::uniform_real_distribution<> dis(0, 1);
+//Crossing Function
+PopulationBin Allele::crossing(PopulationBin parentPopulation)
+{
+    PopulationBin tempPopulation;
+    while(tempPopulation.size() != parentPopulation.size())
+    {
+        IndividualBin firstParent = this->choose1Parent( parentPopulation );
+        IndividualBin secondParent = this->choose1Parent( parentPopulation );
+        Descendant descendant = this->cross2Parents( firstParent, secondParent );
+        tempPopulation.append(firstParent);
+        tempPopulation.append(secondParent);
+        tempPopulation.append(descendant._descendantOne);
+        tempPopulation.append(descendant._descendantTwo);
+    }
+    return tempPopulation;
+}
 
-//    for( int i = 0 ; i < chosenOne.length(); i++ )
-//    {
-//        if( dis(gen) <= pm )
-//        {
-//            if( chosenOne.at(i) == '0'){
-//                mutatedOne.replace( i, '1' );
-//            }else mutatedOne.replace( i, '0');
-//        }
-//    }
+PopulationBin Allele::mutation(PopulationBin tempPopulation)
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis( 0, 1 );
+    for (PopulationBin::iterator it = tempPopulation.begin();
+         it != tempPopulation.end(); ++it){
+        for (int i = 0; i < it->first.first.size(); i++){
+            if (dis(gen) < this->_params["Pm"]){
+                if (it->first.first.at(i) == "0")
+                    it->first.first.replace(i,1,"1");
+                else
+                    it->first.first.replace(i,1,"0");
+            }
+        }
+    }
+    return tempPopulation;
+}
 
-//    return mutatedOne;
-//}
-
-//PopulationBin Allele::crossing(PopulationBin parentPopulation)
-//{
-//    return parentPopulation;
-//}
-
-//PopulationBin Allele::mutation(PopulationBin offspringPopulation)
-//{
-//    return offspringPopulation;
-//}
+Population Allele::offspringPopulation( Population parentPopulation,
+                                        Borders borders)
+{
+    PopulationBin populationBin = this->populationToBin( parentPopulation,
+                                                         borders);
+    PopulationBin crossedPopulation = this->crossing( populationBin );
+    PopulationBin mutatedPopulation = this->mutation( crossedPopulation );
+    Population offspringPopulation = this->binToPopulation( mutatedPopulation,
+                                                            borders);
+    return offspringPopulation;
+}

@@ -16,12 +16,8 @@ NSGAalgorithm::NSGAalgorithm(QVector< QPair< double, double >> borders,
     this->genetic_functions = new Allele(params);
     //Initial Population Creating
     this->_parentPopulation = this->genetic_functions->initPopulation(this->_borders);
-    PopulationBin temp = this->genetic_functions->populationToBin(this->_parentPopulation,
-                                                                  this->_borders);
-    qDebug() << "Parents: " << temp;
-    Descendant tempDes = this->genetic_functions->cross2Parents(temp[0],temp[1]);
-    qDebug() << "First descendant: " << tempDes._descendantOne;
-    qDebug() << "Second descendant: " << tempDes._descendantTwo;
+    this->_offspringPopulation = this->genetic_functions->offspringPopulation(this->_parentPopulation,
+                                                                              this->_borders);
 }
 
 NSGAalgorithm::~NSGAalgorithm()
