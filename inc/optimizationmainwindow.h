@@ -7,6 +7,7 @@
 #include <QVector>
 #include <QDebug>
 #include <QPair>
+#include <QtMath>
 #include <QMap>
 #include "authors.h"
 #include "nsgaalgorithm.h"
