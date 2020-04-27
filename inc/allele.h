@@ -32,6 +32,11 @@ typedef struct descendant{
     IndividualBin _descendantTwo;
 } Descendant;
 
+typedef struct populationCoefficients{
+    QVector<QVector<int>> dominated;
+    QVector<int> counters;
+} PopulationCoefficients;
+
 class Allele : public QObject
 {
     Q_OBJECT
@@ -53,6 +58,9 @@ public:
 
     Population      offspringPopulation( Population parentPopulation,
                                          Borders borders);
+    Population      frontedPopulation( Population t_population, FunctionParser f1, FunctionParser f2 );
+
+
 private:
     Parameters _params;
 

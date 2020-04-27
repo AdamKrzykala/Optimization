@@ -210,3 +210,50 @@ Population Allele::offspringPopulation( Population parentPopulation,
                                                             borders);
     return offspringPopulation;
 }
+
+Population Allele::frontedPopulation(Population t_population, FunctionParser f1, FunctionParser f2)
+{
+    Population fronted_population;
+    QVector<QVector<int>> dominated;
+    QVector<int> counters;
+
+    int pop_size = t_population.size();
+
+    for ( int i = 0 ; i < pop_size ; ++i )
+    {
+        int count = 0;
+        for ( int j = 0 ; j < pop_size; ++j )
+        {
+            if( j == i ) break;
+
+            if( f1.getValue( t_population.at(i).first ) <= f1.getValue(t_population.at(j).first)  or
+                    f2.getValue(t_population.at(i).first) <= f2.getValue(t_population.at(j).first) )
+            {
+                if(!dominated[i].contains(j)) dominated[i].append(j);
+
+            }else
+            {
+                counters[i] = ++count;
+            }
+        }
+    }
+
+    for ( int i = 0 ; i < pop_size ; ++i )
+    {
+
+    }
+
+    int front(1);
+
+    while(1)
+    {
+        for(int i(0); i < t_population.size(); ++i)
+        {
+
+        }
+
+        if(fronted_population.size() >= t_population.size()/2) break;
+    }
+
+    return fronted_population;
+}
