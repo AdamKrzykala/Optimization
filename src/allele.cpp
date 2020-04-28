@@ -219,10 +219,10 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser f1,
 
     int pop_size = t_population.size();
 
-    for ( int i = 0 ; i < pop_size ; ++i )
+    for(int i(0); i < pop_size; ++i)
     {
         int count = 0;
-        for ( int j = 0 ; j < pop_size; ++j )
+        for(int j(0) ; j < pop_size; ++j)
         {
             if( j == i ) break;
 
@@ -238,22 +238,92 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser f1,
         }
     }
 
-    for ( int i = 0 ; i < pop_size ; ++i )
-    {
-
-    }
-
     int front(1);
-
+    int last_front_size(0);
     while(1)
     {
+        last_front_size = fronted_population.size();
         for(int i(0); i < t_population.size(); ++i)
         {
+            if(!counters[i]){
+                fronted_population.append(t_population[i]);
+                fronted_population.last().second["rank"] = front;
 
+                for( auto j : dominated[i]){
+                    --counters[j];
+                }
+                counters[i] = -1;
+            }
         }
-
         if(fronted_population.size() >= t_population.size()/2) break;
     }
 
+    Population temp_pop(fronted_population.mid(last_front_size-1));
+    if(fronted_population.size() > t_population.size()/2)
+    {
+        calculateCrowding(temp_pop, f1, f2);
+    }
+
+    int j = 0;
+    for( int i(last_front_size-1); i < t_population.size()-last_front_size; ++i)
+    {
+        t_population.replace(i, temp_pop[j]);
+        ++j;
+    }
     return fronted_population;
+}
+
+void Allele::calculateCrowding(Population &t_population, FunctionParser &f1, FunctionParser &f2)
+{
+    Population very_temp_population;
+    QVector<FunctionIndicator> f_values;
+
+    for(int i(0); i<t_population.size(); ++i)
+    {
+        FunctionIndicator t_func(i, f1.getValue(t_population[i].first));
+        f_values.append(t_func);
+    }
+
+    std::sort(f_values.begin(), f_values.end());
+    t_population[f_values.size()-1].second["crowding"] = MAXLONG;
+    t_population[0].second["crowding"] = MAXLONG;
+
+    double delta = f_values[f_values.size()-1].function_value-f_values[0].function_value;
+
+    for(int i(1); i<t_population.size()-1; ++i)
+    {
+        t_population[f_values[i].index].second["crowding"] = (f_values[i+1].function_value-f_values[i-1].function_value)/delta;
+    }
+
+    for(int i(0); i<t_population.size(); ++i)
+    {
+        FunctionIndicator t_func(i, f2.getValue(t_population[i].first));
+        f_values.append(t_func);
+    }
+
+    std::sort(f_values.begin(), f_values.end());
+    t_population[f_values.size()-1].second["crowding"] = MAXLONG;
+    t_population[0].second["crowding"] = MAXLONG;
+
+    delta = f_values[f_values.size()-1].function_value-f_values[0].function_value;
+
+    for(int i(1); i<t_population.size()-1; ++i)
+    {
+        if(t_population[f_values[i].index].second["crowding"] < MAXLONG){
+            t_population[f_values[i].index].second["crowding"] = t_population[f_values[i].index].second["crowding"] +
+                    (f_values[i+1].function_value-f_values[i-1].function_value)/delta;
+        }
+    }
+
+    for(int i(0); i<t_population.size(); ++i)
+    {
+        f_values[i].index = i;
+        f_values[i].function_value = t_population[i].second["crowding"];
+    }
+    std::sort(f_values.begin(), f_values.end());
+
+    for(auto i : f_values){
+        very_temp_population.insert(f_values.size()-1-i.index, t_population[i.index]);
+    }
+    t_population = very_temp_population;
 }

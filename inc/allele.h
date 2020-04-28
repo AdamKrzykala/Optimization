@@ -37,6 +37,20 @@ typedef struct populationCoefficients{
     QVector<int> counters;
 } PopulationCoefficients;
 
+struct FunctionIndicator{
+    int index;
+    double function_value;
+
+    friend bool operator< (const FunctionIndicator &a, const FunctionIndicator &b)
+    {
+        return a.function_value > b.function_value;
+    }
+    FunctionIndicator(int i, double j){
+        index = i;
+        function_value = j;
+    }
+};
+
 class Allele : public QObject
 {
     Q_OBJECT
@@ -59,6 +73,7 @@ public:
     Population      offspringPopulation( Population parentPopulation,
                                          Borders borders);
     Population      frontedPopulation( Population t_population, FunctionParser f1, FunctionParser f2 );
+    void            calculateCrowding( Population &t_population, FunctionParser &f1, FunctionParser &f2 );
 
 
 private:
