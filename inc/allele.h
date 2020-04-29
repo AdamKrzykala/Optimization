@@ -10,6 +10,7 @@
 #include <iostream>
 #include <cmath>
 
+#include <limits.h>
 #include "functionparser.h"
 
 //Population, parameters and borders typedef
@@ -72,7 +73,7 @@ public:
 
     Population      offspringPopulation( Population parentPopulation,
                                          Borders borders);
-    Population      frontedPopulation( Population t_population, FunctionParser f1, FunctionParser f2 );
+    Population      frontedPopulation( Population t_population, FunctionParser &f1, FunctionParser &f2 );
     void            calculateCrowding( Population &t_population, FunctionParser &f1, FunctionParser &f2 );
 
 

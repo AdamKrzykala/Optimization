@@ -211,13 +211,13 @@ Population Allele::offspringPopulation( Population parentPopulation,
     return offspringPopulation;
 }
 
-Population Allele::frontedPopulation(Population t_population, FunctionParser f1, FunctionParser f2)
+Population Allele::frontedPopulation(Population t_population, FunctionParser &f1, FunctionParser &f2)
 {
-    Population fronted_population;
-    QVector<QVector<int>> dominated;
-    QVector<int> counters;
-
     int pop_size = t_population.size();
+
+    Population fronted_population;
+    QVector<QVector<int>> dominated(pop_size, QVector<int>(1,0));
+    QVector<int> counters;
 
     for(int i(0); i < pop_size; ++i)
     {
@@ -225,6 +225,7 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser f1,
         for(int j(0) ; j < pop_size; ++j)
         {
             if( j == i ) break;
+            QVector<double> debug_vector = t_population.at(i).first;
 
             if( f1.getValue( t_population.at(i).first ) <= f1.getValue(t_population.at(j).first)  or
                     f2.getValue(t_population.at(i).first) <= f2.getValue(t_population.at(j).first) )
@@ -285,8 +286,8 @@ void Allele::calculateCrowding(Population &t_population, FunctionParser &f1, Fun
     }
 
     std::sort(f_values.begin(), f_values.end());
-    t_population[f_values.size()-1].second["crowding"] = MAXLONG;
-    t_population[0].second["crowding"] = MAXLONG;
+    t_population[f_values.size()-1].second["crowding"] = std::numeric_limits<double>::max();
+    t_population[0].second["crowding"] = std::numeric_limits<double>::max();
 
     double delta = f_values[f_values.size()-1].function_value-f_values[0].function_value;
 
@@ -302,14 +303,14 @@ void Allele::calculateCrowding(Population &t_population, FunctionParser &f1, Fun
     }
 
     std::sort(f_values.begin(), f_values.end());
-    t_population[f_values.size()-1].second["crowding"] = MAXLONG;
-    t_population[0].second["crowding"] = MAXLONG;
+    t_population[f_values.size()-1].second["crowding"] = std::numeric_limits<double>::max();
+    t_population[0].second["crowding"] = std::numeric_limits<double>::max();
 
     delta = f_values[f_values.size()-1].function_value-f_values[0].function_value;
 
     for(int i(1); i<t_population.size()-1; ++i)
     {
-        if(t_population[f_values[i].index].second["crowding"] < MAXLONG){
+        if(t_population[f_values[i].index].second["crowding"] < std::numeric_limits<double>::max()){
             t_population[f_values[i].index].second["crowding"] = t_population[f_values[i].index].second["crowding"] +
                     (f_values[i+1].function_value-f_values[i-1].function_value)/delta;
         }
