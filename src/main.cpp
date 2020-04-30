@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     param["Lp"]=10;
     Allele all(param);
 
-    Borders bord;
+        Borders bord;
     for( int i(0); i<5; ++i)
     {
         bord.push_back(QPair<double, double>(-1000,1000));
@@ -37,7 +37,9 @@ int main(int argc, char *argv[])
 
     Population fuckme;
     fuckme = all.initPopulation(bord);
+    qDebug()<<fuckme.size();
+    fuckme = all.frontedPopulation(fuckme, f1, f2);
+    qDebug()<<fuckme.size();
 
-    all.frontedPopulation(fuckme, f1, f2);
     return 0;
 }

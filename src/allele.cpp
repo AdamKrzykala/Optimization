@@ -12,7 +12,7 @@ Population Allele::initPopulation(Borders borders )
     temp_adaptation.insert("rank",0.0);
     temp_adaptation.insert("crowding",0.0);
     Population temp_population(this->_params["Lp"],
-            Individual(temp_genotype,temp_adaptation));
+            Individual(temp_genotype, temp_adaptation));
 
     std::random_device rd;      //Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd());     //Standard mersenne_twister_engine seeded with rd()
@@ -217,7 +217,7 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
 
     Population fronted_population;
     QVector<QVector<int>> dominated(pop_size, QVector<int>(1,0));
-    QVector<int> counters;
+    QVector<int> counters(pop_size, 0);
 
     for(int i(0); i < pop_size; ++i)
     {
@@ -225,13 +225,10 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
         for(int j(0) ; j < pop_size; ++j)
         {
             if( j == i ) break;
-            QVector<double> debug_vector = t_population.at(i).first;
-
             if( f1.getValue( t_population.at(i).first ) <= f1.getValue(t_population.at(j).first)  or
                     f2.getValue(t_population.at(i).first) <= f2.getValue(t_population.at(j).first) )
             {
                 if(!dominated[i].contains(j)) dominated[i].append(j);
-
             }else
             {
                 counters[i] = ++count;
@@ -246,9 +243,10 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
         last_front_size = fronted_population.size();
         for(int i(0); i < t_population.size(); ++i)
         {
-            if(!counters[i]){
+            if(counters[i] == 0){
                 fronted_population.append(t_population[i]);
                 fronted_population.last().second["rank"] = front;
+                fronted_population.last().second["crowding"] = 0.0;
 
                 for( auto j : dominated[i]){
                     --counters[j];
@@ -256,27 +254,32 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
                 counters[i] = -1;
             }
         }
-        if(fronted_population.size() >= t_population.size()/2) break;
+        if(fronted_population.size() >= (t_population.size()/2)) break;
     }
 
-    Population temp_pop(fronted_population.mid(last_front_size-1));
+    Population temp_pop(fronted_population.mid(last_front_size));
     if(fronted_population.size() > t_population.size()/2)
     {
         calculateCrowding(temp_pop, f1, f2);
     }
 
     int j = 0;
-    for( int i(last_front_size-1); i < t_population.size()-last_front_size; ++i)
+    for( int i(last_front_size); i < fronted_population.size()-last_front_size; ++i)
     {
-        t_population.replace(i, temp_pop[j]);
+        fronted_population.replace(i, temp_pop[j]);
         ++j;
     }
+
+    int id = t_population.size()/2;
+    int n = (t_population.size()/2) - fronted_population.size();
+
+    fronted_population.remove( id, n );
     return fronted_population;
-}
+    }
 
 void Allele::calculateCrowding(Population &t_population, FunctionParser &f1, FunctionParser &f2)
 {
-    Population very_temp_population;
+    Population very_temp_population = t_population;
     QVector<FunctionIndicator> f_values;
 
     for(int i(0); i<t_population.size(); ++i)
@@ -289,16 +292,18 @@ void Allele::calculateCrowding(Population &t_population, FunctionParser &f1, Fun
     t_population[f_values.size()-1].second["crowding"] = std::numeric_limits<double>::max();
     t_population[0].second["crowding"] = std::numeric_limits<double>::max();
 
-    double delta = f_values[f_values.size()-1].function_value-f_values[0].function_value;
+    double delta = f_values.first().function_value-f_values.last().function_value;
 
     for(int i(1); i<t_population.size()-1; ++i)
     {
         t_population[f_values[i].index].second["crowding"] = (f_values[i+1].function_value-f_values[i-1].function_value)/delta;
     }
 
+    f_values.clear();
     for(int i(0); i<t_population.size(); ++i)
     {
-        FunctionIndicator t_func(i, f2.getValue(t_population[i].first));
+        double f2_d = f2.getValue(t_population[i].first);
+        FunctionIndicator t_func(i, f2_d);
         f_values.append(t_func);
     }
 
@@ -306,9 +311,9 @@ void Allele::calculateCrowding(Population &t_population, FunctionParser &f1, Fun
     t_population[f_values.size()-1].second["crowding"] = std::numeric_limits<double>::max();
     t_population[0].second["crowding"] = std::numeric_limits<double>::max();
 
-    delta = f_values[f_values.size()-1].function_value-f_values[0].function_value;
+    delta = f_values.first().function_value - f_values.last().function_value;
 
-    for(int i(1); i<t_population.size()-1; ++i)
+    for(int i(1); i<t_population.size(); ++i)
     {
         if(t_population[f_values[i].index].second["crowding"] < std::numeric_limits<double>::max()){
             t_population[f_values[i].index].second["crowding"] = t_population[f_values[i].index].second["crowding"] +
@@ -323,8 +328,8 @@ void Allele::calculateCrowding(Population &t_population, FunctionParser &f1, Fun
     }
     std::sort(f_values.begin(), f_values.end());
 
-    for(auto i : f_values){
-        very_temp_population.insert(f_values.size()-1-i.index, t_population[i.index]);
+    for(int i(0); i<f_values.size(); ++i){
+        very_temp_population.replace(f_values[i].index, t_population[f_values[i].index]);
     }
     t_population = very_temp_population;
 }
