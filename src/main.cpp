@@ -12,17 +12,9 @@ int main(int argc, char *argv[])
 //    startWindow.showMaximized();
 
 //    return a.exec();
+
     FunctionParser f1(QString("x1^2+x2^3+x3+x4+x5"));
     FunctionParser f2(QString("x1^4+x2+x3+x4+x5"));
-
-//    QVector<T> iksy;
-//    iksy.append(1);
-//    iksy.append(2);
-//    iksy.append(1);
-//    iksy.append(1);
-//    iksy.append(1);
-//    qDebug()<<f1.getValue(iksy);
-//    qDebug()<<f2.getValue(iksy);
 
     Parameters param;
     param["n"]=5;
