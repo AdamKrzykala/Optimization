@@ -46,10 +46,6 @@ struct FunctionIndicator{
     {
         return a.function_value > b.function_value;
     }
-    FunctionIndicator(int i, double j){
-        index = i;
-        function_value = j;
-    }
 };
 
 class Allele : public QObject

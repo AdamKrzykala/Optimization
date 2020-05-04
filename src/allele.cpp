@@ -290,7 +290,9 @@ void Allele::calculateCrowding(Population &t_population, FunctionParser &f1, Fun
     // getting values of function1 for all population
     for(int i(0); i<t_population.size(); ++i)
     {
-        FunctionIndicator t_func(i, f1.getValue(t_population[i].first));
+        FunctionIndicator t_func;
+        t_func.index = i;
+        t_func.function_value = f1.getValue(t_population[i].first) ;
         f_values.append(t_func);
     }
 
@@ -314,7 +316,9 @@ void Allele::calculateCrowding(Population &t_population, FunctionParser &f1, Fun
     for(int i(0); i<t_population.size(); ++i)
     {
         double f2_d = f2.getValue(t_population[i].first);
-        FunctionIndicator t_func(i, f2_d);
+        FunctionIndicator t_func;
+        t_func.index = i;
+        t_func.function_value = f2_d;
         f_values.append(t_func);
     }
 
