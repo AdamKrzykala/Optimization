@@ -211,6 +211,11 @@ Population Allele::offspringPopulation( Population parentPopulation,
     return offspringPopulation;
 }
 
+bool compareCrowding(const Individual &i1, const Individual &i2)
+{
+    return i1.second["crowding"] > i2.second["crowding"];
+}
+
 Population Allele::frontedPopulation(Population t_population, FunctionParser &f1, FunctionParser &f2)
 {
     int pop_size = t_population.size();
@@ -219,19 +224,21 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     QVector<QVector<int>> dominated(pop_size, QVector<int>(0,0));
     QVector<int> counters(pop_size, 0);
 
+
+
     for(int i(0); i < pop_size; ++i)
     {
-        int count = 0;
         for(int j(0) ; j < pop_size; ++j)
         {
             if( j != i ){
-                if( (f1.getValue( t_population.at(i).first ) <= f1.getValue(t_population.at(j).first))  and
-                        (f2.getValue(t_population.at(i).first) <= f2.getValue(t_population.at(j).first)) and
-                        (f1.getValue( t_population.at(i).first ) < f1.getValue(t_population.at(j).first))  or
-                        (f2.getValue(t_population.at(i).first) < f2.getValue(t_population.at(j).first)))
+                if( ((f1.getValue( t_population.at(i).first ) <= f1.getValue(t_population.at(j).first))  and
+                        (f2.getValue(t_population.at(i).first) <= f2.getValue(t_population.at(j).first))) and
+                        ((f1.getValue( t_population.at(i).first ) < f1.getValue(t_population.at(j).first))  or
+                        (f2.getValue(t_population.at(i).first) < f2.getValue(t_population.at(j).first))))
                 {
                     dominated[i].append(j);
-                }else
+                }
+                else
                 {
                     counters[i]++;
                 }
@@ -265,6 +272,7 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     if(fronted_population.size() > t_population.size()/2)
     {
         calculateCrowding(temp_pop, f1, f2);
+        std::sort(temp_pop.begin(),temp_pop.end(),compareCrowding);
 
         int j = 0;
         for( int i(last_front_size); i < fronted_population.size()-last_front_size; ++i)
@@ -281,6 +289,7 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
 
     return fronted_population;
     }
+
 
 void Allele::calculateCrowding(Population &t_population, FunctionParser &f1, FunctionParser &f2)
 {

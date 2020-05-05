@@ -18,6 +18,18 @@ NSGAalgorithm::NSGAalgorithm(QVector< QPair< double, double >> borders,
     this->_parentPopulation = this->genetic_functions->initPopulation(this->_borders);
     this->_offspringPopulation = this->genetic_functions->offspringPopulation(this->_parentPopulation,
                                                                               this->_borders);
+
+    qDebug() << "Parent population: ";
+    qDebug() << this->_parentPopulation;
+//    qDebug() << "Offspring population: ";
+//    qDebug() << this->_offspringPopulation;
+
+    Population temp = this->genetic_functions->frontedPopulation(this->_parentPopulation, *this->function1, *this->function2);
+//    qDebug() << "Fronted Parent population: ";
+//    qDebug() << temp;
+//    qDebug() << "Crowded Parent population: ";
+//    this->genetic_functions->calculateCrowding(temp, *this->function1, *this->function2);
+//    qDebug() << temp;
 }
 
 NSGAalgorithm::~NSGAalgorithm()
