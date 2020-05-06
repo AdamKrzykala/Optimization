@@ -21,15 +21,15 @@ NSGAalgorithm::NSGAalgorithm(QVector< QPair< double, double >> borders,
 
     qDebug() << "Parent population: ";
     qDebug() << this->_parentPopulation;
-//    qDebug() << "Offspring population: ";
-//    qDebug() << this->_offspringPopulation;
+    qDebug() << "Offspring population: ";
+    qDebug() << this->_offspringPopulation;
 
     Population temp = this->genetic_functions->frontedPopulation(this->_parentPopulation, *this->function1, *this->function2);
-//    qDebug() << "Fronted Parent population: ";
-//    qDebug() << temp;
-//    qDebug() << "Crowded Parent population: ";
-//    this->genetic_functions->calculateCrowding(temp, *this->function1, *this->function2);
-//    qDebug() << temp;
+    qDebug() << "Fronted Parent population: ";
+    qDebug() << temp;
+    qDebug() << "Crowded Parent population: ";
+    Population temp2 = this->genetic_functions->calculateCrowding(temp, *this->function1, *this->function2);
+    qDebug() << temp2;
 }
 
 NSGAalgorithm::~NSGAalgorithm()

@@ -44,7 +44,7 @@ struct FunctionIndicator{
 
     friend bool operator< (const FunctionIndicator &a, const FunctionIndicator &b)
     {
-        return a.function_value > b.function_value;
+        return a.function_value < b.function_value;
     }
 };
 
@@ -70,7 +70,7 @@ public:
     Population      offspringPopulation( Population parentPopulation,
                                          Borders borders);
     Population      frontedPopulation( Population t_population, FunctionParser &f1, FunctionParser &f2 );
-    void            calculateCrowding( Population &t_population, FunctionParser &f1, FunctionParser &f2 );
+    Population      calculateCrowding( Population &t_population, FunctionParser &f1, FunctionParser &f2 );
 
 
 private:

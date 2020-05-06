@@ -1061,7 +1061,7 @@ color: rgb(255, 255, 255);</string>
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>1</string>
+             <string>0.9</string>
             </property>
            </widget>
           </item>
@@ -1096,7 +1096,7 @@ color: rgb(255, 255, 255);</string>
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>1</string>
+             <string>0.01</string>
             </property>
            </widget>
           </item>
