@@ -28,7 +28,7 @@ FunctionParser::FunctionParser(QString newFunction, QObject *parent) : QObject(p
 
 T FunctionParser::getValue(QVector<T> x)
 {
-    for(int i = 0; i < X.length(); i++){
+    for(int i = 0; i < x.length(); i++){
         this->x[i] = T(x[i]);
     }
     return expression->value();

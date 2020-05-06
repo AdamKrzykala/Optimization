@@ -12,7 +12,7 @@ Population Allele::initPopulation(Borders borders )
     temp_adaptation.insert("rank",0.0);
     temp_adaptation.insert("crowding",0.0);
     Population temp_population(this->_params["Lp"],
-            Individual(temp_genotype,temp_adaptation));
+            Individual(temp_genotype, temp_adaptation));
 
     std::random_device rd;      //Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd());     //Standard mersenne_twister_engine seeded with rd()
@@ -210,3 +210,244 @@ Population Allele::offspringPopulation( Population parentPopulation,
                                                             borders);
     return offspringPopulation;
 }
+
+bool compareCrowding(const Individual &i1, const Individual &i2)
+{
+    return i1.second["crowding"] > i2.second["crowding"];
+}
+
+Population Allele::frontedPopulation(Population t_population, FunctionParser &f1, FunctionParser &f2)
+{
+    int pop_size = t_population.size();
+
+    Population fronted_population;
+    QVector<QVector<int>> dominated(pop_size, QVector<int>(0,0));
+    QVector<int> counters(pop_size, 0);
+
+
+
+    for(int i(0); i < pop_size; ++i)
+    {
+        for(int j(0) ; j < pop_size; ++j)
+        {
+            if( j != i ){
+                if( ((f1.getValue( t_population.at(i).first ) <= f1.getValue(t_population.at(j).first))  and
+                        (f2.getValue(t_population.at(i).first) <= f2.getValue(t_population.at(j).first))) and
+                        ((f1.getValue( t_population.at(i).first ) < f1.getValue(t_population.at(j).first))  or
+                        (f2.getValue(t_population.at(i).first) < f2.getValue(t_population.at(j).first))))
+                {
+                    dominated[i].append(j);
+                }
+                else
+                {
+                    counters[i]++;
+                }
+            }
+        }
+    }
+
+    int front(1);
+    int last_front_size(0);
+    while(1)
+    {
+        last_front_size = fronted_population.size();
+        for(int i(0); i < t_population.size(); ++i)
+        {
+            if(counters[i] == 0){
+                fronted_population.append(t_population[i]);
+                fronted_population.last().second["rank"] = front;
+                fronted_population.last().second["crowding"] = 0.0;
+
+                for( auto j : dominated[i]){
+                    --counters[j];
+                }
+                counters[i] = -1;
+            }
+        }
+        front++;
+        if(fronted_population.size() >= (t_population.size()/2)) break;
+    }
+
+    Population temp_pop(fronted_population.mid(last_front_size));
+    if(fronted_population.size() > t_population.size()/2)
+    {
+        calculateCrowding(temp_pop, f1, f2);
+        std::sort(temp_pop.begin(),temp_pop.end(),compareCrowding);
+
+        int j = 0;
+        for( int i(last_front_size); i < fronted_population.size()-last_front_size; ++i)
+        {
+            fronted_population.replace(i, temp_pop[j]);
+            ++j;
+        }
+
+        int id = t_population.size()/2;
+        int n = fronted_population.size() - (t_population.size()/2);
+
+        fronted_population.remove( id, n );
+    }
+
+    return fronted_population;
+    }
+
+
+Population Allele::calculateCrowding(Population &t_population, FunctionParser &f1, FunctionParser &f2)
+{
+    Population OutputPopulation;
+    //Creating vector of fronts -- the size = number of crowding distance main loops
+    QVector<int> fronts;
+    auto assignFront = [&](const Individual& singleIndividual) {
+        int temp_rank = singleIndividual.second["rank"];
+        if (std::find(fronts.begin(), fronts.end(), temp_rank) == fronts.end()) {
+            fronts.append(temp_rank);
+        }
+    };
+    std::for_each(t_population.begin(),t_population.end(),assignFront);
+    int frontsIter = fronts.size();
+
+    //Main Loop of Crowding Distance for each front
+    int mainLoopIter = 0;
+    while (mainLoopIter < frontsIter) {
+        //Numbe of front -- fronts[mainLoopIter];
+        //Getting all of elements in current front fronts[mainLoopIter]
+        Population currentFront;
+        for (int i = 0; i < t_population.size(); i++){
+            if (t_population[i].second["rank"] == fronts[mainLoopIter]){
+                currentFront.append(t_population[i]);
+
+            }
+        }
+        //Now currentFront holds all of Individuals from one front
+        //Getting values of function1 for current front
+        QVector<FunctionIndicator> functionValues;
+        for(int i = 0; i < currentFront.size(); ++i)
+        {
+            FunctionIndicator oneFunc;
+            oneFunc.index = i;
+            oneFunc.function_value = f1.getValue(currentFront[i].first);
+            functionValues.append(oneFunc);
+        }
+        std::sort(functionValues.begin(), functionValues.end());
+        //Crowding distance for min value to inf set
+        currentFront[functionValues.first().index].second["crowding"] = std::numeric_limits<double>::max();
+        //Crowding distance for max value to inf set
+        currentFront[functionValues.last().index].second["crowding"] = std::numeric_limits<double>::max();
+        double delta = functionValues.last().function_value-functionValues.first().function_value;
+        // calculating crowding for first function; indexes witgout margin values
+        for(int i = 1; i < currentFront.size()-1; ++i)
+        {
+            currentFront[functionValues[i].index].second["crowding"] = (functionValues[i+1].function_value-functionValues[i-1].function_value)/delta;
+        }
+        // clearing vector for calculaing function 2 values
+        functionValues.clear();
+        for(int i = 0; i < currentFront.size(); ++i)
+        {
+            FunctionIndicator oneFunc;
+            oneFunc.index = i;
+            oneFunc.function_value = f2.getValue(currentFront[i].first);
+            functionValues.append(oneFunc);
+        }
+
+        // sorting non-descending order all calculated values
+        std::sort(functionValues.begin(), functionValues.end());
+        //Crowding distance for min value to inf set
+        if (currentFront[functionValues.first().index].second["crowding"] != std::numeric_limits<double>::max()){
+            currentFront[functionValues.first().index].second["crowding"] = std::numeric_limits<double>::max();
+        }
+        //Crowding distance for max value to inf set
+        if (currentFront[functionValues.last().index].second["crowding"] != std::numeric_limits<double>::max()){
+            currentFront[functionValues.last().index].second["crowding"] = std::numeric_limits<double>::max();
+        }
+
+        delta = functionValues.last().function_value - functionValues.first().function_value;
+
+        // calculating crowding for first function; indexes witgout margin values
+        for(int i = 1; i < currentFront.size()-1; ++i)
+        {
+            if(currentFront[functionValues[i].index].second["crowding"] < std::numeric_limits<double>::max()){
+               currentFront[functionValues[i].index].second["crowding"] = currentFront[functionValues[i].index].second["crowding"] +
+                        (functionValues[i+1].function_value-functionValues[i-1].function_value)/delta;
+            }
+        }
+
+        //Sorting is not urgent
+        //Copying to output population
+        for (int i = 0; i < currentFront.size(); i++){
+            OutputPopulation.append(currentFront[i]);
+        }
+        //Clearing currentFront for next Loop
+        currentFront.clear();
+        ++mainLoopIter;
+    }
+    return OutputPopulation;
+}
+
+//void Allele::calculateCrowding(Population &t_population, FunctionParser &f1, FunctionParser &f2)
+//{
+//    Population very_temp_population = t_population;
+//    QVector<FunctionIndicator> f_values;
+
+//    // getting values of function1 for all population
+//    for(int i(0); i<t_population.size(); ++i)
+//    {
+//        FunctionIndicator t_func;
+//        t_func.index = i;
+//        t_func.function_value = f1.getValue(t_population[i].first) ;
+//        f_values.append(t_func);
+//    }
+
+//    // sorting non-descending order all calculated values
+//    std::sort(f_values.begin(), f_values.end());
+
+//    // for margin values crowding is set as max value for double type
+//    t_population[f_values.size()-1].second["crowding"] = std::numeric_limits<double>::max();
+//    t_population[0].second["crowding"] = std::numeric_limits<double>::max();
+
+//    double delta = f_values.first().function_value-f_values.last().function_value;
+
+//    // calculating crowding for first function; indexes witgout margin values
+//    for(int i(1); i<t_population.size()-1; ++i)
+//    {
+//        t_population[f_values[i].index].second["crowding"] = (f_values[i+1].function_value-f_values[i-1].function_value)/delta;
+//    }
+
+//    // clearing vector for calculaing function 2 values
+//    f_values.clear();
+//    for(int i(0); i<t_population.size(); ++i)
+//    {
+//        double f2_d = f2.getValue(t_population[i].first);
+//        FunctionIndicator t_func;
+//        t_func.index = i;
+//        t_func.function_value = f2_d;
+//        f_values.append(t_func);
+//    }
+
+//    // sorting non-descending order all calculated values
+//    std::sort(f_values.begin(), f_values.end());
+//    t_population[f_values.size()-1].second["crowding"] = std::numeric_limits<double>::max();
+//    t_population[0].second["crowding"] = std::numeric_limits<double>::max();
+
+//    delta = f_values.first().function_value - f_values.last().function_value;
+
+//    // calculating crowding for first function; indexes witgout margin values
+//    for(int i(1); i<t_population.size()-1; ++i)
+//    {
+//        if(t_population[f_values[i].index].second["crowding"] < std::numeric_limits<double>::max()){
+//            t_population[f_values[i].index].second["crowding"] = t_population[f_values[i].index].second["crowding"] +
+//                    (f_values[i+1].function_value-f_values[i-1].function_value)/delta;
+//        }
+//    }
+
+//    // FunctionIndicator vector is used here as assistant vector for sorting in descending order calculated crowding values
+//    for(int i(0); i<t_population.size(); ++i)
+//    {
+//        f_values[i].index = i;
+//        f_values[i].function_value = t_population[i].second["crowding"];
+//    }
+//    std::sort(f_values.begin(), f_values.end());
+
+//    for(int i(0); i<f_values.size(); ++i){
+//        very_temp_population.replace(f_values[i].index, t_population[f_values[i].index]);
+//    }
+//    t_population = very_temp_population;
+//}

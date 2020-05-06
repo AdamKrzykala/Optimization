@@ -10,6 +10,7 @@
 #include <iostream>
 #include <cmath>
 
+#include <limits.h>
 #include "functionparser.h"
 
 //Population, parameters and borders typedef
@@ -32,6 +33,21 @@ typedef struct descendant{
     IndividualBin _descendantTwo;
 } Descendant;
 
+typedef struct populationCoefficients{
+    QVector<QVector<int>> dominated;
+    QVector<int> counters;
+} PopulationCoefficients;
+
+struct FunctionIndicator{
+    int index;
+    double function_value;
+
+    friend bool operator< (const FunctionIndicator &a, const FunctionIndicator &b)
+    {
+        return a.function_value < b.function_value;
+    }
+};
+
 class Allele : public QObject
 {
     Q_OBJECT
@@ -53,6 +69,10 @@ public:
 
     Population      offspringPopulation( Population parentPopulation,
                                          Borders borders);
+    Population      frontedPopulation( Population t_population, FunctionParser &f1, FunctionParser &f2 );
+    Population      calculateCrowding( Population &t_population, FunctionParser &f1, FunctionParser &f2 );
+
+
 private:
     Parameters _params;
 
