@@ -93,11 +93,12 @@ Population Allele::binToPopulation( PopulationBin populationBin,
             if(!con_flag) throw QString("Conversion from binary to longlong was not succesful");
 
             T temp_gene = (gene/pow(10,4))+borders.at(j).first;
-            chromosome_b10.append(temp_gene);
+            chromosome_b10.append((double)temp_gene);
 
             if(!chromosome_b2.size()) break;
             ++j;
         }
+
     decoded_population.append(Individual(chromosome_b10,temp_adaptation));
     }
     return decoded_population;
@@ -211,11 +212,22 @@ Population Allele::offspringPopulation( Population parentPopulation,
     return offspringPopulation;
 }
 
+bool checkIfTheSame(const Individual &i1, const Individual &i2)
+{
+    for (int i = 0; i < i1.first.size(); i++){
+        if (i1.first[i] != i2.first[i]) return false;
+    }
+    return true;
+}
+
 bool checkIfAdjusted(const Individual &i1, const Borders &borders)
 {
     Genotype tempGenotype = i1.first;
     for (int i = 0; i < tempGenotype.size(); i++){
-        if (!(tempGenotype[i] > borders[i].first && tempGenotype[i] < borders[i].second)){
+        if (tempGenotype[i] < borders[i].first){
+            return false;
+        }
+        if (tempGenotype[i] > borders[i].second){
             return false;
         }
     }
@@ -235,13 +247,11 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     QVector<QVector<int>> dominated(pop_size, QVector<int>(0,0));
     QVector<int> counters(pop_size, 0);
 
-
-
-    for(int i(0); i < pop_size; ++i)
+    for(int i = 0; i < pop_size; ++i)
     {
-        for(int j(0) ; j < pop_size; ++j)
+        for(int j = 0 ; j < pop_size; ++j)
         {
-            if( j != i ){
+            if( j != i && (!checkIfTheSame(t_population.at(i),t_population.at(j)))){
                 if( ((f1.getValue( t_population.at(i).first ) <= f1.getValue(t_population.at(j).first))  and
                         (f2.getValue(t_population.at(i).first) <= f2.getValue(t_population.at(j).first))) and
                         ((f1.getValue( t_population.at(i).first ) < f1.getValue(t_population.at(j).first))  or
@@ -256,9 +266,8 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
             }
         }
     }
-
-    int front(1);
-    int last_front_size(0);
+    int front = 1;
+    int last_front_size = 0;
     while(1)
     {
         last_front_size = fronted_population.size();
