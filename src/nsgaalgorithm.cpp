@@ -71,4 +71,5 @@ void NSGAalgorithm::NSGA_MainLoop(void)
     qDebug() <<"x:"<< _parentPopulation.last();
     qDebug() <<"f1 value: "<<this->function1->getValue(_parentPopulation.first().first);
     qDebug() <<"f2 value: "<<this->function2->getValue(_parentPopulation.first().first);
+
 }
