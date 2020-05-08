@@ -69,9 +69,12 @@ public:
 
     Population      offspringPopulation( Population parentPopulation,
                                          Borders borders);
-    Population      frontedPopulation( Population t_population, FunctionParser &f1, FunctionParser &f2 );
+    Population      frontedPopulation( Population t_population, FunctionParser &f1, FunctionParser &f2, Borders borders );
     Population      calculateCrowding( Population &t_population, FunctionParser &f1, FunctionParser &f2 );
 
+    virtual ~Allele(){
+        delete this;
+    }
 
 private:
     Parameters _params;

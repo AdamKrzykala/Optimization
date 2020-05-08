@@ -20,11 +20,13 @@ class NSGAalgorithm : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit NSGAalgorithm(QVector<QPair<double,double>>,
+    explicit NSGAalgorithm( Borders,
                             QMap<QString,T>,
                             QMap<int,QString>,
                             QWidget *parent = 0);
-    ~NSGAalgorithm();
+    virtual ~NSGAalgorithm();
+
+    Population ConcatenatePopulation(Population,Population);
 
     void NSGA_MainLoop(void);
 
@@ -35,6 +37,7 @@ private:
     Allele *genetic_functions;
     Population _parentPopulation;
     Population _offspringPopulation;
+    Population _concatenatedPopulation;
     Parameters _params;
     Borders _borders;
 };

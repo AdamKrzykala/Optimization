@@ -211,12 +211,23 @@ Population Allele::offspringPopulation( Population parentPopulation,
     return offspringPopulation;
 }
 
+bool checkIfAdjusted(const Individual &i1, const Borders &borders)
+{
+    Genotype tempGenotype = i1.first;
+    for (int i = 0; i < tempGenotype.size(); i++){
+        if (!(tempGenotype[i] > borders[i].first && tempGenotype[i] < borders[i].second)){
+            return false;
+        }
+    }
+    return true;
+}
+
 bool compareCrowding(const Individual &i1, const Individual &i2)
 {
     return i1.second["crowding"] > i2.second["crowding"];
 }
 
-Population Allele::frontedPopulation(Population t_population, FunctionParser &f1, FunctionParser &f2)
+Population Allele::frontedPopulation(Population t_population, FunctionParser &f1, FunctionParser &f2, Borders borders)
 {
     int pop_size = t_population.size();
 
@@ -251,12 +262,14 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     while(1)
     {
         last_front_size = fronted_population.size();
-        for(int i(0); i < t_population.size(); ++i)
+        for(int i = 0; i < t_population.size(); ++i)
         {
             if(counters[i] == 0){
-                fronted_population.append(t_population[i]);
-                fronted_population.last().second["rank"] = front;
-                fronted_population.last().second["crowding"] = 0.0;
+                if (checkIfAdjusted(t_population[i], borders)){
+                    fronted_population.append(t_population[i]);
+                    fronted_population.last().second["rank"] = front;
+                    fronted_population.last().second["crowding"] = 0.0;
+                }
 
                 for( auto j : dominated[i]){
                     --counters[j];
@@ -267,6 +280,8 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
         front++;
         if(fronted_population.size() >= (t_population.size()/2)) break;
     }
+
+    assert(fronted_population.size() >= (t_population.size()/2) && "Too small population due to a mutation");
 
     Population temp_pop(fronted_population.mid(last_front_size));
     if(fronted_population.size() > t_population.size()/2)
@@ -381,73 +396,3 @@ Population Allele::calculateCrowding(Population &t_population, FunctionParser &f
     }
     return OutputPopulation;
 }
-
-//void Allele::calculateCrowding(Population &t_population, FunctionParser &f1, FunctionParser &f2)
-//{
-//    Population very_temp_population = t_population;
-//    QVector<FunctionIndicator> f_values;
-
-//    // getting values of function1 for all population
-//    for(int i(0); i<t_population.size(); ++i)
-//    {
-//        FunctionIndicator t_func;
-//        t_func.index = i;
-//        t_func.function_value = f1.getValue(t_population[i].first) ;
-//        f_values.append(t_func);
-//    }
-
-//    // sorting non-descending order all calculated values
-//    std::sort(f_values.begin(), f_values.end());
-
-//    // for margin values crowding is set as max value for double type
-//    t_population[f_values.size()-1].second["crowding"] = std::numeric_limits<double>::max();
-//    t_population[0].second["crowding"] = std::numeric_limits<double>::max();
-
-//    double delta = f_values.first().function_value-f_values.last().function_value;
-
-//    // calculating crowding for first function; indexes witgout margin values
-//    for(int i(1); i<t_population.size()-1; ++i)
-//    {
-//        t_population[f_values[i].index].second["crowding"] = (f_values[i+1].function_value-f_values[i-1].function_value)/delta;
-//    }
-
-//    // clearing vector for calculaing function 2 values
-//    f_values.clear();
-//    for(int i(0); i<t_population.size(); ++i)
-//    {
-//        double f2_d = f2.getValue(t_population[i].first);
-//        FunctionIndicator t_func;
-//        t_func.index = i;
-//        t_func.function_value = f2_d;
-//        f_values.append(t_func);
-//    }
-
-//    // sorting non-descending order all calculated values
-//    std::sort(f_values.begin(), f_values.end());
-//    t_population[f_values.size()-1].second["crowding"] = std::numeric_limits<double>::max();
-//    t_population[0].second["crowding"] = std::numeric_limits<double>::max();
-
-//    delta = f_values.first().function_value - f_values.last().function_value;
-
-//    // calculating crowding for first function; indexes witgout margin values
-//    for(int i(1); i<t_population.size()-1; ++i)
-//    {
-//        if(t_population[f_values[i].index].second["crowding"] < std::numeric_limits<double>::max()){
-//            t_population[f_values[i].index].second["crowding"] = t_population[f_values[i].index].second["crowding"] +
-//                    (f_values[i+1].function_value-f_values[i-1].function_value)/delta;
-//        }
-//    }
-
-//    // FunctionIndicator vector is used here as assistant vector for sorting in descending order calculated crowding values
-//    for(int i(0); i<t_population.size(); ++i)
-//    {
-//        f_values[i].index = i;
-//        f_values[i].function_value = t_population[i].second["crowding"];
-//    }
-//    std::sort(f_values.begin(), f_values.end());
-
-//    for(int i(0); i<f_values.size(); ++i){
-//        very_temp_population.replace(f_values[i].index, t_population[f_values[i].index]);
-//    }
-//    t_population = very_temp_population;
-//}
