@@ -1,6 +1,6 @@
 #include "nsgaalgorithm.h"
 #include "ui_nsgaalgorithm.h"
-
+#include <ctime>
 NSGAalgorithm::NSGAalgorithm(Borders borders,
                                QMap< QString, T > params,
                                QMap< int, QString > functions,
@@ -39,6 +39,10 @@ Population NSGAalgorithm::ConcatenatePopulation( Population p1, Population p2 )
 void NSGAalgorithm::NSGA_MainLoop(void)
 {
     int do_iter = this->_params["Lg"];
+    std::clock_t start;
+       double duration;
+
+       start = std::clock(); // get current time
     while(do_iter)
     {
     //Main Process
@@ -60,4 +64,11 @@ void NSGAalgorithm::NSGA_MainLoop(void)
         this->_parentPopulation = this->genetic_functions->calculateCrowding(frontedPopulation, *this->function1, *this->function2);
         --do_iter;
     }
+
+    duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+
+    qDebug() << "Operation took "<< duration << "seconds";
+    qDebug() <<"x:"<< _parentPopulation.last();
+    qDebug() <<"f1 value: "<<this->function1->getValue(_parentPopulation.first().first);
+    qDebug() <<"f2 value: "<<this->function2->getValue(_parentPopulation.first().first);
 }
