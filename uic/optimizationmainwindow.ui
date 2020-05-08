@@ -220,7 +220,7 @@ font: 25 12pt &quot;Ubuntu&quot;;</string>
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>-1000</string>
+             <string>-10</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -258,7 +258,7 @@ font: 25 12pt &quot;Ubuntu&quot;;</string>
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>1000</string>
+             <string>10</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -337,7 +337,7 @@ font: 25 12pt &quot;Ubuntu&quot;;</string>
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>-1000</string>
+             <string>-10</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -375,7 +375,7 @@ font: 25 12pt &quot;Ubuntu&quot;;</string>
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>1000</string>
+             <string>10</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -901,7 +901,7 @@ color: rgb(255, 255, 255);</string>
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>x1^2+x2^2+x3^2+x4^2+x5^2</string>
+             <string>x1^4+x2^4-0.62*x1^2-0.62*x2^2</string>
             </property>
            </widget>
           </item>
@@ -912,7 +912,7 @@ color: rgb(255, 255, 255);</string>
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>x1^2+x2^2+x3^2+x4^2+x5^2</string>
+             <string>0</string>
             </property>
            </widget>
           </item>
@@ -991,7 +991,7 @@ color: rgb(255, 255, 255);</string>
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>1000</string>
+             <string>100</string>
             </property>
            </widget>
           </item>
@@ -1026,7 +1026,7 @@ color: rgb(255, 255, 255);</string>
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>1</string>
+             <string>100</string>
             </property>
            </widget>
           </item>
@@ -1061,7 +1061,7 @@ color: rgb(255, 255, 255);</string>
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>0.9</string>
+             <string>0.5</string>
             </property>
            </widget>
           </item>

@@ -239,6 +239,17 @@ bool compareCrowding(const Individual &i1, const Individual &i2)
     return i1.second["crowding"] > i2.second["crowding"];
 }
 
+int secondMinValue(QVector<int> counters)
+{
+    int minValue = std::numeric_limits<int>::max();
+    for (int i = 0; i < counters.size(); i++){
+        if (counters[i] < minValue && counters[i] != -1){
+            minValue = counters[i];
+        }
+    }
+    return minValue;
+}
+
 Population Allele::frontedPopulation(Population t_population, FunctionParser &f1, FunctionParser &f2, Borders borders)
 {
     int pop_size = t_population.size();
@@ -267,13 +278,14 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
         }
     }
     int front = 1;
+
     int last_front_size = 0;
     while(1)
     {
         last_front_size = fronted_population.size();
         for(int i = 0; i < t_population.size(); ++i)
         {
-            if(counters[i] == 0){
+            if(counters[i] == secondMinValue(counters)){
                 if (checkIfAdjusted(t_population[i], borders)){
                     fronted_population.append(t_population[i]);
                     fronted_population.last().second["rank"] = front;
@@ -285,6 +297,7 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
                 }
                 counters[i] = -1;
             }
+            //qDebug() << "COunters: " << counters;
         }
         front++;
         if(fronted_population.size() >= (t_population.size()/2)) break;

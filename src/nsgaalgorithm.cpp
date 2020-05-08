@@ -60,4 +60,5 @@ void NSGAalgorithm::NSGA_MainLoop(void)
         this->_parentPopulation = this->genetic_functions->calculateCrowding(frontedPopulation, *this->function1, *this->function2);
         --do_iter;
     }
+    qDebug() << this->_parentPopulation;
 }
