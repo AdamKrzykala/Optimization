@@ -1,5 +1,15 @@
 <RCC>
     <qresource prefix="/res">
         <file>resources/images/logo.png</file>
+        <file>resources/images/empty.png</file>
+        <file>resources/images/f1.png</file>
+        <file>resources/images/f2.png</file>
+        <file>resources/images/f4.png</file>
+        <file>resources/images/f5.png</file>
+        <file>resources/images/f6.png</file>
+        <file>resources/images/f7.png</file>
+        <file>resources/images/f8.png</file>
+        <file>resources/images/f9.png</file>
+        <file>resources/images/f10.png</file>
     </qresource>
 </RCC>

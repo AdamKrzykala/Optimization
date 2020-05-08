@@ -150,3 +150,20 @@ void OptimizationMainWindow::on_AlgorithmStartButton_clicked()
     this->optimizationTask->showMaximized();
     //this->optimizationTask->NSGA_MainLoop();
 }
+
+void OptimizationMainWindow::on_FunctionLibraryButton_clicked()
+{
+    LibraryWindow *libWin = new LibraryWindow(this);
+
+    connect(libWin, SIGNAL(ok_clicked(QString, QString)), this, SLOT(on_libraryOkLibraryButton_clicked(QString, QString)));
+
+    libWin->setAttribute(Qt::WA_DeleteOnClose);
+    libWin->setWindowTitle("Function library");
+    libWin->exec();
+}
+
+void OptimizationMainWindow::on_libraryOkLibraryButton_clicked(QString f1, QString f2)
+{
+   if(f1.size())  ui->FirstFunctionString->setText(f1);
+   if(f2.size())  ui->SecondFunctionString->setText(f2);
+}

@@ -34,7 +34,7 @@ RSC = $$PWD/../res
 
 DESTDIR = $$PWD/..
 
-q# tutaj miały być ładnie poukładne foldery, ale szkoda mi już czasu dochodzić czemu qt mnie nie słuch
+# tutaj miały być ładnie poukładne foldery, ale szkoda mi już czasu dochodzić czemu qt mnie nie słuch
 #DESTDIR = $$PWD/../build
 #OBJECTS_DIR = $$PWD/../build/obj
 #MOC_DIR = $$PWD/../build/moc

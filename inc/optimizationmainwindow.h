@@ -11,6 +11,7 @@
 #include <QMap>
 #include "authors.h"
 #include "nsgaalgorithm.h"
+#include "librarywindow.h"
 
 template <class Key, class T> class QMap;
 
@@ -40,6 +41,10 @@ private slots:
     void on_actionAuthors_triggered();
     void on_DimButton_clicked();
     void on_AlgorithmStartButton_clicked();
+    void on_FunctionLibraryButton_clicked();
+
+public slots:
+    void on_libraryOkLibraryButton_clicked(QString, QString);
 };
 
 #endif // OPTIMIZATIONMAINWINDOW_H
