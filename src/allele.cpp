@@ -254,24 +254,31 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
 {
     int pop_size = t_population.size();
 
+    //Calculating counters and dominated objects for each element of population
     Population fronted_population;
-    QVector<QVector<int>> dominated(pop_size, QVector<int>(0,0));
+    QVector<QVector<int>> dominated(pop_size, QVector<int>(0));
     QVector<int> counters(pop_size, 0);
-
     for(int i = 0; i < pop_size; ++i)
     {
-        for(int j = 0 ; j < pop_size; ++j)
+        for(int j = i ; j < pop_size; ++j)
         {
             if( j != i && (!checkIfTheSame(t_population.at(i),t_population.at(j)))){
-                if( ((f1.getValue( t_population.at(i).first ) <= f1.getValue(t_population.at(j).first))  and
-                        (f2.getValue(t_population.at(i).first) <= f2.getValue(t_population.at(j).first))) and
-                        ((f1.getValue( t_population.at(i).first ) < f1.getValue(t_population.at(j).first))  or
-                        (f2.getValue(t_population.at(i).first) < f2.getValue(t_population.at(j).first))))
+                double f1i = f1.getValue( t_population.at(i).first);
+                double f1j = f1.getValue( t_population.at(j).first);
+                double f2i = f2.getValue( t_population.at(i).first);
+                double f2j = f2.getValue( t_population.at(j).first);
+
+                if( ((f1i <= f1j)  and
+                     (f2i <= f2j)) and
+                    ((f1i <  f1j)  or
+                     (f2i <  f2j)) )
                 {
                     dominated[i].append(j);
+                    counters[j]++;
                 }
                 else
                 {
+                    dominated[j].append(i);
                     counters[i]++;
                 }
             }
@@ -280,12 +287,15 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     int front = 1;
 
     int last_front_size = 0;
+    int minValue = 0;
+    //Calculating fronts and taking exact amount of fronts
     while(1)
     {
         last_front_size = fronted_population.size();
-        for(int i = 0; i < t_population.size(); ++i)
+        minValue = secondMinValue(counters);
+        for(int i = 0; i < pop_size; ++i)
         {
-            if(counters[i] == secondMinValue(counters)){
+            if(counters[i] == minValue){
                 if (checkIfAdjusted(t_population[i], borders)){
                     fronted_population.append(t_population[i]);
                     fronted_population.last().second["rank"] = front;
@@ -297,13 +307,13 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
                 }
                 counters[i] = -1;
             }
-            //qDebug() << "COunters: " << counters;
         }
         front++;
         if(fronted_population.size() >= (t_population.size()/2)) break;
     }
 
-    assert(fronted_population.size() >= (t_population.size()/2) && "Too small population due to a mutation");
+    //Assertion due to a mutation to rebuild
+    //assert(fronted_population.size() >= (t_population.size()/2) && "Too small population due to a mutation");
 
     Population temp_pop(fronted_population.mid(last_front_size));
     if(fronted_population.size() > t_population.size()/2)
