@@ -254,6 +254,7 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
 {
     int pop_size = t_population.size();
 
+    //Calculating counters and dominated objects for each element of population
     Population fronted_population;
     QVector<QVector<int>> dominated(pop_size, QVector<int>(0));
     QVector<int> counters(pop_size, 0);
@@ -287,12 +288,12 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
 
     int last_front_size = 0;
     int minValue = 0;
-
+    //Calculating fronts and taking exact amount of fronts
     while(1)
     {
         last_front_size = fronted_population.size();
         minValue = secondMinValue(counters);
-        for(int i = 0; i < t_population.size(); ++i)
+        for(int i = 0; i < pop_size; ++i)
         {
             if(counters[i] == minValue){
                 if (checkIfAdjusted(t_population[i], borders)){
@@ -311,7 +312,8 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
         if(fronted_population.size() >= (t_population.size()/2)) break;
     }
 
-    assert(fronted_population.size() >= (t_population.size()/2) && "Too small population due to a mutation");
+    //Assertion due to a mutation to rebuild
+    //assert(fronted_population.size() >= (t_population.size()/2) && "Too small population due to a mutation");
 
     Population temp_pop(fronted_population.mid(last_front_size));
     if(fronted_population.size() > t_population.size()/2)
