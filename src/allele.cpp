@@ -257,10 +257,9 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     Population fronted_population;
     QVector<QVector<int>> dominated(pop_size, QVector<int>(0,0));
     QVector<int> counters(pop_size, 0);
-
     for(int i = 0; i < pop_size; ++i)
     {
-        for(int j = 0 ; j < pop_size; ++j)
+        for(int j = i ; j < pop_size; ++j)
         {
             if( j != i && (!checkIfTheSame(t_population.at(i),t_population.at(j)))){
                 if( ((f1.getValue( t_population.at(i).first ) <= f1.getValue(t_population.at(j).first))  and
@@ -269,9 +268,11 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
                         (f2.getValue(t_population.at(i).first) < f2.getValue(t_population.at(j).first))))
                 {
                     dominated[i].append(j);
+                    counters[j]++;
                 }
                 else
                 {
+                    dominated[j].append(i);
                     counters[i]++;
                 }
             }
