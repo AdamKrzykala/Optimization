@@ -280,12 +280,15 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     int front = 1;
 
     int last_front_size = 0;
+    int minValue = 0;
+
     while(1)
     {
         last_front_size = fronted_population.size();
+        minValue = secondMinValue(counters);
         for(int i = 0; i < t_population.size(); ++i)
         {
-            if(counters[i] == secondMinValue(counters)){
+            if(counters[i] == minValue){
                 if (checkIfAdjusted(t_population[i], borders)){
                     fronted_population.append(t_population[i]);
                     fronted_population.last().second["rank"] = front;
