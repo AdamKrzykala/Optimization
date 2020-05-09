@@ -255,17 +255,22 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     int pop_size = t_population.size();
 
     Population fronted_population;
-    QVector<QVector<int>> dominated(pop_size, QVector<int>(0,0));
+    QVector<QVector<int>> dominated(pop_size, QVector<int>(0));
     QVector<int> counters(pop_size, 0);
     for(int i = 0; i < pop_size; ++i)
     {
         for(int j = i ; j < pop_size; ++j)
         {
             if( j != i && (!checkIfTheSame(t_population.at(i),t_population.at(j)))){
-                if( ((f1.getValue( t_population.at(i).first ) <= f1.getValue(t_population.at(j).first))  and
-                        (f2.getValue(t_population.at(i).first) <= f2.getValue(t_population.at(j).first))) and
-                        ((f1.getValue( t_population.at(i).first ) < f1.getValue(t_population.at(j).first))  or
-                        (f2.getValue(t_population.at(i).first) < f2.getValue(t_population.at(j).first))))
+                double f1i = f1.getValue( t_population.at(i).first);
+                double f1j = f1.getValue( t_population.at(j).first);
+                double f2i = f2.getValue( t_population.at(i).first);
+                double f2j = f2.getValue( t_population.at(j).first);
+
+                if( ((f1i <= f1j)  and
+                     (f2i <= f2j)) and
+                    ((f1i <  f1j)  or
+                     (f2i <  f2j)) )
                 {
                     dominated[i].append(j);
                     counters[j]++;
@@ -301,7 +306,6 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
                 }
                 counters[i] = -1;
             }
-            //qDebug() << "COunters: " << counters;
         }
         front++;
         if(fronted_population.size() >= (t_population.size()/2)) break;
