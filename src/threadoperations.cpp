@@ -56,8 +56,8 @@ threadOperations::threadOperations(Population t_population,
                                    FunctionParser &f2)
 {
     this->pop_size = t_population.size();
-    this->dominated = QVector<QVector<int>>(this->pop_size, QVector<int>(0));
-    this->counters = QVector<int>(this->pop_size, 0);
+    this->dominated = QVector<QVector<int>>(this->pop_size,QVector<int>(0));
+    this->counters = QVector<int>(this->pop_size,0);
     this->t_population = t_population;
     this->f1 = &f1;
     this->f2 = &f2;

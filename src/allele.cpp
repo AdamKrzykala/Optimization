@@ -216,14 +216,6 @@ Population Allele::offspringPopulation( Population parentPopulation,
     return offspringPopulation;
 }
 
-//bool checkIfTheSame(const Individual &i1, const Individual &i2)
-//{
-//    for (int i = 0; i < i1.first.size(); i++){
-//        if (i1.first[i] != i2.first[i]) return false;
-//    }
-//    return true;
-//}
-
 bool checkIfAdjusted(const Individual &i1, const Borders &borders)
 {
     Genotype tempGenotype = i1.first;
@@ -245,9 +237,8 @@ bool compareCrowding(const Individual &i1, const Individual &i2)
 
 int secondMinValue(QVector<int> counters)
 {
-    int countersSize = counters.size();
     int minValue = std::numeric_limits<int>::max();
-    for (int i = 0; i < countersSize; i++){
+    for (int i = 0; i < counters.size(); i++){
         if (counters[i] < minValue && counters[i] != -1){
             minValue = counters[i];
         }
@@ -261,9 +252,6 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     //Calculating counters and dominated objects for each element of population
     Population fronted_population;
 
-    QVector<QVector<int>> dominated(pop_size, QVector<int>(0));
-    QVector<int> counters(pop_size, 0);
-
     //Calculating dependanties
     threadOperations *threadProcess = new threadOperations(t_population,f1,f2);
     std::thread tw1 = threadProcess->parallelFunctionThread();
@@ -276,36 +264,10 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     tw3.join();
     tw4.join();
 
-    dominated = threadProcess->returnDominated();
-    counters = threadProcess->returnCounters();
+    QVector<QVector<int>> dominated = threadProcess->returnDominated();
+    QVector<int> counters = threadProcess->returnCounters();
     delete threadProcess;
-    //Traditional way
-//    for(int i = 0; i < pop_size; ++i)
-//    {
-//
-//            if( j != i && (!checkIfTheSame(t_population.at(i),t_population.at(j)))){
-//                double f1i = f1.getValue( t_population.at(i).first);
-//                double f1j = f1.getValue( t_population.at(j).first);
-//                double f2i = f2.getValue( t_population.at(i).first);
-//                double f2j = f2.getValue( t_population.at(j).first);
 
-//                if( ((f1i <= f1j)  and
-//                     (f2i <= f2j)) and
-//                    ((f1i <  f1j)  or
-//                     (f2i <  f2j)) )
-//                {
-//                    dominated[i].append(j);
-//                    counters[j]++;
-//                }
-//                else
-//                {
-//                    dominated[j].append(i);
-//                    counters[i]++;
-//                }
-//            }
-//        }
-//    }
-    qDebug() << "aaaa";
     int front = 1;
     int last_front_size = 0;
     int minValue = 0;
@@ -325,8 +287,9 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
                 }
 
                 for( auto j : dominated[i]){
-                    --counters[j];
-                }
+                                    --counters[j];
+                                }
+
                 counters[i] = -1;
             }
         }
