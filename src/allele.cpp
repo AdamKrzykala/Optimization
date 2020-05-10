@@ -315,10 +315,10 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     //Assertion due to a mutation to rebuild
     //assert(fronted_population.size() >= (t_population.size()/2) && "Too small population due to a mutation");
 
-    Population temp_pop(fronted_population.mid(last_front_size));
+    Population last_front(fronted_population.mid(last_front_size));
     if(fronted_population.size() > t_population.size()/2)
     {
-        calculateCrowding(temp_pop, f1, f2);
+        Population temp_pop = calculateCrowding(last_front, f1, f2);
         std::sort(temp_pop.begin(),temp_pop.end(),compareCrowding);
 
         int j = 0;
