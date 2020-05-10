@@ -205,13 +205,8 @@ PopulationBin Allele::mutation(PopulationBin tempPopulation)
 Population Allele::offspringPopulation( Population parentPopulation,
                                         Borders borders)
 {
-    std::clock_t start;
-       double duration;
     PopulationBin populationBin = this->populationToBin( parentPopulation,
                                                          borders);
-    duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-    qDebug() << "Operation took "<< duration << "seconds";
-
     PopulationBin crossedPopulation = this->crossing( populationBin );
     PopulationBin mutatedPopulation = this->mutation( crossedPopulation );
     Population offspringPopulation = this->binToPopulation( mutatedPopulation,
@@ -246,10 +241,11 @@ bool compareCrowding(const Individual &i1, const Individual &i2)
     return i1.second["crowding"] > i2.second["crowding"];
 }
 
-int secondMinValue(QVector<int> counters)
+int secondMinValue( int counters [])
 {
+    int n = sizeof(counters)/sizeof(int);
     int minValue = std::numeric_limits<int>::max();
-    for (int i = 0; i < counters.size(); i++){
+    for (int i = 0; i < n; i++){
         if (counters[i] < minValue && counters[i] != -1){
             minValue = counters[i];
         }
@@ -257,17 +253,46 @@ int secondMinValue(QVector<int> counters)
     return minValue;
 }
 
+void myAppend(int t[], int a)
+{
+    int n = sizeof(t)/sizeof(int);
+    for(int i(0); i<n ; ++i)
+    {
+        if(t[i] == -1){t[i]=a; break;}
+    }
+}
+
+void init2DArray(int **t)
+{
+    for(int i(0); i<10000; ++i)
+    {
+        int tab[10000];
+        for(int j(0); j<10000; ++j)
+        {
+            tab[j] = -1;
+        }
+        t[i] = tab;
+    }
+}
+
 Population Allele::frontedPopulation(Population t_population, FunctionParser &f1, FunctionParser &f2, Borders borders)
 {
     int pop_size = t_population.size();
-    int tab_size = 100000;
     //Calculating counters and dominated objects for each element of population
     Population fronted_population;
-    int tab[tab_size];
-    [&](int t[]){for(int i(0);i<tab_size;i++){t[i]=-1;}}(tab);
-    QVector<int*> dominated(pop_size, tab);
+
+//    QVector<int*> dominated(pop_size, tab);
+
+    int **dominated;
+    dominated = new int *[100000];
+    init2DArray(dominated);
+
 //    QVector<QVector<int>> dominated(pop_size, QVector<int>(0));
-    QVector<int> counters(pop_size, 0);
+//    QVector<int> counters(pop_size, 0);
+
+    int counters[100000];
+    [](int t[]){for(int i(0);i<100000;i++){t[i]=0;}}(counters);
+
     for(int i = 0; i < pop_size; ++i)
     {
         for(int j = i ; j < pop_size; ++j)
@@ -445,11 +470,3 @@ Population Allele::calculateCrowding(Population &t_population, FunctionParser &f
     return OutputPopulation;
 }
 
-void Allele::myAppend(int t[], int a)
-{
-    int n = sizeof(t)/sizeof(int);
-    for(int i(0); i<n ; ++i)
-    {
-        if(t[i] == -1){t[i]=a; break;}
-    }
-}
