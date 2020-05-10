@@ -1,4 +1,6 @@
 #include "allele.h"
+#include <ctime>
+
 
 Allele::Allele(Parameters params, QObject *parent) : QObject(parent)
 {
@@ -203,8 +205,13 @@ PopulationBin Allele::mutation(PopulationBin tempPopulation)
 Population Allele::offspringPopulation( Population parentPopulation,
                                         Borders borders)
 {
+    std::clock_t start;
+       double duration;
     PopulationBin populationBin = this->populationToBin( parentPopulation,
                                                          borders);
+    duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    qDebug() << "Operation took "<< duration << "seconds";
+
     PopulationBin crossedPopulation = this->crossing( populationBin );
     PopulationBin mutatedPopulation = this->mutation( crossedPopulation );
     Population offspringPopulation = this->binToPopulation( mutatedPopulation,
@@ -253,10 +260,13 @@ int secondMinValue(QVector<int> counters)
 Population Allele::frontedPopulation(Population t_population, FunctionParser &f1, FunctionParser &f2, Borders borders)
 {
     int pop_size = t_population.size();
-
+    int tab_size = 100000;
     //Calculating counters and dominated objects for each element of population
     Population fronted_population;
-    QVector<QVector<int>> dominated(pop_size, QVector<int>(0));
+    int tab[tab_size];
+    [&](int t[]){for(int i(0);i<tab_size;i++){t[i]=-1;}}(tab);
+    QVector<int*> dominated(pop_size, tab);
+//    QVector<QVector<int>> dominated(pop_size, QVector<int>(0));
     QVector<int> counters(pop_size, 0);
     for(int i = 0; i < pop_size; ++i)
     {
@@ -273,12 +283,14 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
                     ((f1i <  f1j)  or
                      (f2i <  f2j)) )
                 {
-                    dominated[i].append(j);
+                    myAppend(dominated[i], j);
+//                    dominated[i].append(j);
                     counters[j]++;
                 }
                 else
                 {
-                    dominated[j].append(i);
+                    myAppend(dominated[j], i);
+//                    dominated[j].append(i);
                     counters[i]++;
                 }
             }
@@ -302,9 +314,16 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
                     fronted_population.last().second["crowding"] = 0.0;
                 }
 
-                for( auto j : dominated[i]){
+                int j = 0;
+                while (1) {
+                    if( *(dominated[i]+j) == -1) break;
                     --counters[j];
+                    ++j;
                 }
+
+//                for( auto j : dominated[i]){
+//                    --counters[j];
+//                }
                 counters[i] = -1;
             }
         }
@@ -424,4 +443,13 @@ Population Allele::calculateCrowding(Population &t_population, FunctionParser &f
         ++mainLoopIter;
     }
     return OutputPopulation;
+}
+
+void Allele::myAppend(int t[], int a)
+{
+    int n = sizeof(t)/sizeof(int);
+    for(int i(0); i<n ; ++i)
+    {
+        if(t[i] == -1){t[i]=a; break;}
+    }
 }

@@ -68,8 +68,8 @@ void NSGAalgorithm::NSGA_MainLoop(void)
     duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 
     qDebug() << "Operation took "<< duration << "seconds";
-    qDebug() <<"x:"<< _parentPopulation;
-    //qDebug() <<"f1 value: "<<this->function1->getValue(_parentPopulation.first().first);
-    //qDebug() <<"f2 value: "<<this->function2->getValue(_parentPopulation.first().first);
+//    qDebug() <<"x:"<< _parentPopulation;
+    qDebug() <<"f1 value: "<<this->function1->getValue(_parentPopulation.first().first);
+    qDebug() <<"f2 value: "<<this->function2->getValue(_parentPopulation.first().first);
 
 }

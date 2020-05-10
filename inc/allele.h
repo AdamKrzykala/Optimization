@@ -78,6 +78,7 @@ public:
 
 private:
     Parameters _params;
+    void myAppend(int t[], int a);
 
 };
 
