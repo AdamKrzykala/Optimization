@@ -36,13 +36,17 @@ Population NSGAalgorithm::ConcatenatePopulation( Population p1, Population p2 )
     return outputPopulation;
 }
 
+inline double my_clock(void) {
+  struct timeval t;
+  gettimeofday(&t, NULL);
+  return (1.0e-6*t.tv_usec + t.tv_sec);
+}
+
 void NSGAalgorithm::NSGA_MainLoop(void)
 {
     int do_iter = this->_params["Lg"];
-    std::clock_t start;
-       double duration;
-
-       start = std::clock(); // get current time
+    double start_time, end_time, duration;
+    start_time = my_clock();
     while(do_iter)
     {
     //Main Process
@@ -64,10 +68,10 @@ void NSGAalgorithm::NSGA_MainLoop(void)
         this->_parentPopulation = this->genetic_functions->calculateCrowding(frontedPopulation, *this->function1, *this->function2);
         --do_iter;
     }
+    end_time = my_clock();
+    duration = end_time - start_time;
 
-    duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-
-    qDebug() << "Operation took "<< duration << "seconds";
+    qDebug() << "Operation took "<< duration << " seconds";
 //    qDebug() <<"x:"<< _parentPopulation;
     qDebug() <<"f1 value: "<<this->function1->getValue(_parentPopulation.first().first);
     qDebug() <<"f2 value: "<<this->function2->getValue(_parentPopulation.first().first);
