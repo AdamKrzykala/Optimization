@@ -366,7 +366,7 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
         std::sort(temp_pop.begin(),temp_pop.end(),compareCrowding);
 
         int j = 0;
-        for( int i(last_front_size); i < fronted_population.size()-last_front_size; ++i)
+        for( int i = last_front_size; i < pop_size; ++i)
         {
             fronted_population.replace(i, temp_pop[j]);
             ++j;
