@@ -1,5 +1,7 @@
 #include "allele.h"
 #include <ctime>
+#include <thread>
+#include <mutex>
 
 
 Allele::Allele(Parameters params, QObject *parent) : QObject(parent)
@@ -214,13 +216,13 @@ Population Allele::offspringPopulation( Population parentPopulation,
     return offspringPopulation;
 }
 
-bool checkIfTheSame(const Individual &i1, const Individual &i2)
-{
-    for (int i = 0; i < i1.first.size(); i++){
-        if (i1.first[i] != i2.first[i]) return false;
-    }
-    return true;
-}
+//bool checkIfTheSame(const Individual &i1, const Individual &i2)
+//{
+//    for (int i = 0; i < i1.first.size(); i++){
+//        if (i1.first[i] != i2.first[i]) return false;
+//    }
+//    return true;
+//}
 
 bool checkIfAdjusted(const Individual &i1, const Borders &borders)
 {
@@ -241,38 +243,16 @@ bool compareCrowding(const Individual &i1, const Individual &i2)
     return i1.second["crowding"] > i2.second["crowding"];
 }
 
-int secondMinValue( int counters [])
+int secondMinValue(QVector<int> counters)
 {
-    int n = sizeof(counters)/sizeof(int);
+    int countersSize = counters.size();
     int minValue = std::numeric_limits<int>::max();
-    for (int i = 0; i < n; i++){
+    for (int i = 0; i < countersSize; i++){
         if (counters[i] < minValue && counters[i] != -1){
             minValue = counters[i];
         }
     }
     return minValue;
-}
-
-void myAppend(int t[], int a)
-{
-    int n = sizeof(t)/sizeof(int);
-    for(int i(0); i<n ; ++i)
-    {
-        if(t[i] == -1){t[i]=a; break;}
-    }
-}
-
-void init2DArray(int **t)
-{
-    for(int i(0); i<10000; ++i)
-    {
-        int tab[10000];
-        for(int j(0); j<10000; ++j)
-        {
-            tab[j] = -1;
-        }
-        t[i] = tab;
-    }
 }
 
 Population Allele::frontedPopulation(Population t_population, FunctionParser &f1, FunctionParser &f2, Borders borders)
@@ -281,50 +261,55 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     //Calculating counters and dominated objects for each element of population
     Population fronted_population;
 
-//    QVector<int*> dominated(pop_size, tab);
+    QVector<QVector<int>> dominated(pop_size, QVector<int>(0));
+    QVector<int> counters(pop_size, 0);
 
-    int **dominated;
-    dominated = new int *[100000];
-    init2DArray(dominated);
+    //Calculating dependanties
+    threadOperations *threadProcess = new threadOperations(t_population,f1,f2);
+    std::thread tw1 = threadProcess->parallelFunctionThread();
+    std::thread tw2 = threadProcess->parallelFunctionThread();
+    std::thread tw3 = threadProcess->parallelFunctionThread();
+    std::thread tw4 = threadProcess->parallelFunctionThread();
 
-//    QVector<QVector<int>> dominated(pop_size, QVector<int>(0));
-//    QVector<int> counters(pop_size, 0);
+    tw1.join();
+    tw2.join();
+    tw3.join();
+    tw4.join();
 
-    int counters[100000];
-    [](int t[]){for(int i(0);i<100000;i++){t[i]=0;}}(counters);
+    dominated = threadProcess->returnDominated();
+    counters = threadProcess->returnCounters();
+    delete threadProcess;
+    //Traditional way
+//    for(int i = 0; i < pop_size; ++i)
+//    {
+//
+//            if( j != i && (!checkIfTheSame(t_population.at(i),t_population.at(j)))){
+//                double f1i = f1.getValue( t_population.at(i).first);
+//                double f1j = f1.getValue( t_population.at(j).first);
+//                double f2i = f2.getValue( t_population.at(i).first);
+//                double f2j = f2.getValue( t_population.at(j).first);
 
-    for(int i = 0; i < pop_size; ++i)
-    {
-        for(int j = i ; j < pop_size; ++j)
-        {
-            if( j != i && (!checkIfTheSame(t_population.at(i),t_population.at(j)))){
-                double f1i = f1.getValue( t_population.at(i).first);
-                double f1j = f1.getValue( t_population.at(j).first);
-                double f2i = f2.getValue( t_population.at(i).first);
-                double f2j = f2.getValue( t_population.at(j).first);
-
-                if( ((f1i <= f1j)  and
-                     (f2i <= f2j)) and
-                    ((f1i <  f1j)  or
-                     (f2i <  f2j)) )
-                {
-                    myAppend(dominated[i], j);
+//                if( ((f1i <= f1j)  and
+//                     (f2i <= f2j)) and
+//                    ((f1i <  f1j)  or
+//                     (f2i <  f2j)) )
+//                {
 //                    dominated[i].append(j);
-                    counters[j]++;
-                }
-                else
-                {
-                    myAppend(dominated[j], i);
+//                    counters[j]++;
+//                }
+//                else
+//                {
 //                    dominated[j].append(i);
-                    counters[i]++;
-                }
-            }
-        }
-    }
+//                    counters[i]++;
+//                }
+//            }
+//        }
+//    }
+    qDebug() << "aaaa";
     int front = 1;
-
     int last_front_size = 0;
     int minValue = 0;
+
     //Calculating fronts and taking exact amount of fronts
     while(1)
     {
@@ -339,16 +324,9 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
                     fronted_population.last().second["crowding"] = 0.0;
                 }
 
-                int j = 0;
-                while (1) {
-                    if( *(dominated[i]+j) == -1) break;
+                for( auto j : dominated[i]){
                     --counters[j];
-                    ++j;
                 }
-
-//                for( auto j : dominated[i]){
-//                    --counters[j];
-//                }
                 counters[i] = -1;
             }
         }
@@ -366,13 +344,13 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
         std::sort(temp_pop.begin(),temp_pop.end(),compareCrowding);
 
         int j = 0;
-        for( int i = last_front_size; i < pop_size; ++i)
+        for( int i = last_front_size; i < pop_size/2; ++i)
         {
             fronted_population.replace(i, temp_pop[j]);
             ++j;
         }
 
-        fronted_population.remove( t_population.size()/2 , fronted_population.size() - (t_population.size()/2) );
+        fronted_population.remove( pop_size/2 , fronted_population.size() - (t_population.size()/2) );
     }
 
     return fronted_population;

@@ -12,6 +12,7 @@
 
 #include <limits.h>
 #include "functionparser.h"
+#include "threadoperations.h"
 
 //Population, parameters and borders typedef
     typedef QMap< QString, double > Adaptation;
