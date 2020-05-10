@@ -328,10 +328,7 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
             ++j;
         }
 
-        int id = t_population.size()/2;
-        int n = fronted_population.size() - (t_population.size()/2);
-
-        fronted_population.remove( id, n );
+        fronted_population.remove( t_population.size()/2 , fronted_population.size() - (t_population.size()/2) );
     }
 
     return fronted_population;
