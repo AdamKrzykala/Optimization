@@ -128,20 +128,31 @@ Descendant Allele::cross2Parents(IndividualBin firstParent, IndividualBin second
     temp_adaptation.insert("crowding",0.0);
     newDescendant._descendantOne = IndividualBin(firstParentGenotype,temp_adaptation);
     newDescendant._descendantTwo = IndividualBin(secondParentGenotype,temp_adaptation);
-    for (int i = 0; i < firstParentGenotype.first.size()/allelDimension; i++)
+//    for (int i = 0; i < firstParentGenotype.first.size()/allelDimension; i++)
+//    {
+//        int start_pos = i*allelDimension+1;
+//        if(dis(gen) < cross_prob){
+//            newDescendant._descendantOne.first.first.replace(start_pos,
+//                                                             allelDimension,
+//                                                             secondParentGenotype.first.mid(start_pos,allelDimension));
+//        }
+//        if(dis(gen) < cross_prob){
+//            newDescendant._descendantTwo.first.first.replace(start_pos,
+//                                                             allelDimension,
+//                                                             firstParentGenotype.first.mid(start_pos,allelDimension));
+//        }
+//    }
+    for (int i(0); i < allelDimension; ++i)
     {
-        int start_pos = i*allelDimension+1;
-        if(dis(gen) < cross_prob){
-            newDescendant._descendantOne.first.first.replace(start_pos,
-                                                             allelDimension,
-                                                             secondParentGenotype.first.mid(start_pos,allelDimension));
-        }
-        if(dis(gen) < cross_prob){
-            newDescendant._descendantTwo.first.first.replace(start_pos,
-                                                             allelDimension,
-                                                             firstParentGenotype.first.mid(start_pos,allelDimension));
+        if(dis(gen) <= cross_prob){
+            newDescendant._descendantOne.first.first.replace(i, 1, firstParentGenotype.first.at(i));
+            newDescendant._descendantTwo.first.first.replace(i, 1, secondParentGenotype.first.at(i));
+        }else{
+            newDescendant._descendantOne.first.first.replace(i, 1, secondParentGenotype.first.at(i));
+            newDescendant._descendantTwo.first.first.replace(i, 1, firstParentGenotype.first.at(i));
         }
     }
+
     return newDescendant;
 }
 
@@ -232,7 +243,7 @@ bool checkIfAdjusted(const Individual &i1, const Borders &borders)
 
 bool compareCrowding(const Individual &i1, const Individual &i2)
 {
-    return i1.second["crowding"] > i2.second["crowding"];
+    return i1.second["crowding"] < i2.second["crowding"];
 }
 
 int secondMinValue(QVector<int> counters)
@@ -287,8 +298,8 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
                 }
 
                 for( auto j : dominated[i]){
-                                    --counters[j];
-                                }
+                    --counters[j];
+                }
 
                 counters[i] = -1;
             }
@@ -309,7 +320,7 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
         int j = 0;
         for( int i = last_front_size; i < pop_size/2; ++i)
         {
-            fronted_population.replace(i, temp_pop[j]);
+            fronted_population.replace(i, temp_pop[temp_pop.size()-j-1]);
             ++j;
         }
 
