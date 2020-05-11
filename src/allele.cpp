@@ -305,7 +305,6 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     {
         Population temp_pop = calculateCrowding(last_front, f1, f2);
         std::sort(temp_pop.begin(),temp_pop.end(),compareCrowding);
-
         int j = 0;
         for( int i = last_front_size; i < pop_size/2; ++i)
         {
@@ -343,61 +342,53 @@ Population Allele::calculateCrowding(Population &t_population, FunctionParser &f
         for (int i = 0; i < t_population.size(); i++){
             if (t_population[i].second["rank"] == fronts[mainLoopIter]){
                 currentFront.append(t_population[i]);
-
             }
         }
         //Now currentFront holds all of Individuals from one front
         //Getting values of function1 for current front
-        QVector<FunctionIndicator> functionValues;
+        QVector<FunctionIndicator> functionValues1;
         for(int i = 0; i < currentFront.size(); ++i)
         {
             FunctionIndicator oneFunc;
             oneFunc.index = i;
             oneFunc.function_value = f1.getValue(currentFront[i].first);
-            functionValues.append(oneFunc);
+            functionValues1.append(oneFunc);
         }
-        std::sort(functionValues.begin(), functionValues.end());
-        //Crowding distance for min value to inf set
-        currentFront[functionValues.first().index].second["crowding"] = std::numeric_limits<double>::max();
-        //Crowding distance for max value to inf set
-        currentFront[functionValues.last().index].second["crowding"] = std::numeric_limits<double>::max();
-        double delta = functionValues.last().function_value-functionValues.first().function_value;
-        // calculating crowding for first function; indexes witgout margin values
-        for(int i = 1; i < currentFront.size()-1; ++i)
-        {
-            currentFront[functionValues[i].index].second["crowding"] = (functionValues[i+1].function_value-functionValues[i-1].function_value)/delta;
-        }
-        // clearing vector for calculaing function 2 values
-        functionValues.clear();
+
+        QVector<FunctionIndicator> functionValues2;
         for(int i = 0; i < currentFront.size(); ++i)
         {
             FunctionIndicator oneFunc;
             oneFunc.index = i;
             oneFunc.function_value = f2.getValue(currentFront[i].first);
-            functionValues.append(oneFunc);
+            functionValues2.append(oneFunc);
         }
 
         // sorting non-descending order all calculated values
-        std::sort(functionValues.begin(), functionValues.end());
-        //Crowding distance for min value to inf set
-        if (currentFront[functionValues.first().index].second["crowding"] != std::numeric_limits<double>::max()){
-            currentFront[functionValues.first().index].second["crowding"] = std::numeric_limits<double>::max();
-        }
-        //Crowding distance for max value to inf set
-        if (currentFront[functionValues.last().index].second["crowding"] != std::numeric_limits<double>::max()){
-            currentFront[functionValues.last().index].second["crowding"] = std::numeric_limits<double>::max();
-        }
+        std::sort(functionValues1.begin(), functionValues1.end());
+        std::sort(functionValues2.begin(), functionValues2.end());
 
-        delta = functionValues.last().function_value - functionValues.first().function_value;
+        //Crowding distance for min value f1 to inf set
+        currentFront[functionValues1.first().index].second["crowding"] = INFINITY;
+        //Crowding distance for min value f2 to inf set
+        currentFront[functionValues2.first().index].second["crowding"] = INFINITY;
+
+        double delta1 = functionValues1.last().function_value - functionValues1.first().function_value;
+        double delta2 = functionValues2.last().function_value - functionValues2.first().function_value;
 
         // calculating crowding for first function; indexes witgout margin values
         for(int i = 1; i < currentFront.size()-1; ++i)
         {
-            if(currentFront[functionValues[i].index].second["crowding"] < std::numeric_limits<double>::max()){
-               currentFront[functionValues[i].index].second["crowding"] = currentFront[functionValues[i].index].second["crowding"] +
-                        (functionValues[i+1].function_value-functionValues[i-1].function_value)/delta;
+            if (!(delta1 == 0)){
+                currentFront[functionValues1[i].index].second["crowding"] = currentFront[functionValues1[i].index].second["crowding"]
+                        + (functionValues1[i+1].function_value-functionValues1[i-1].function_value)/delta1;
+            }
+            if (!(delta2 == 0)){
+                currentFront[functionValues2[i].index].second["crowding"] = currentFront[functionValues2[i].index].second["crowding"]
+                        + (functionValues2[i+1].function_value-functionValues2[i-1].function_value)/delta2;
             }
         }
+
 
         //Sorting is not urgent
         //Copying to output population

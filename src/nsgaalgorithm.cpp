@@ -70,8 +70,6 @@ void NSGAalgorithm::NSGA_MainLoop(void)
         //qDebug() << "-----Creating fronts";
         Population frontedPopulation = this->genetic_functions->frontedPopulation(processPopulation, *this->function1, *this->function2, this->_borders);
         //Calculate crowding in each front
-        this->_parentPopulation.clear();
-        this->_offspringPopulation.clear();
         //qDebug() << "-----Calcualte crowding distances";
         this->_parentPopulation = this->genetic_functions->calculateCrowding(frontedPopulation, *this->function1, *this->function2);
         int it = this->_params["Lg"] - do_iter;
