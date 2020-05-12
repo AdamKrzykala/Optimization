@@ -128,6 +128,8 @@ Descendant Allele::cross2Parents(IndividualBin firstParent, IndividualBin second
     temp_adaptation.insert("crowding",0.0);
     newDescendant._descendantOne = IndividualBin(firstParentGenotype,temp_adaptation);
     newDescendant._descendantTwo = IndividualBin(secondParentGenotype,temp_adaptation);
+
+    //old crossing
     for (int i = 0; i < firstParentGenotype.first.size()/allelDimension; i++)
     {
         int start_pos = i*allelDimension+1;
