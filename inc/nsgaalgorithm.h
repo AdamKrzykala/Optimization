@@ -49,6 +49,7 @@ private:
     Ui::NSGAalgorithm *ui;
     FunctionParser *function1;
     FunctionParser *function2;
+
     Allele *genetic_functions;
     Population _parentPopulation;
     Population _offspringPopulation;

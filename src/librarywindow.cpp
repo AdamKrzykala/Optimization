@@ -44,41 +44,30 @@ LibraryWindow::LibraryWindow(QWidget *parent) : QDialog(parent)
 
 void LibraryWindow::addFunctions(QListWidget *temp_list)
 {
-    temp_list->addItem("[Funkcja Binha-Korna]\n"
-                       "f1 = 4*x1^4+4*x2^2\n"
-                       "f2 = (x1-5)^2+(x2-5)^2");
+    temp_list->addItem("[FONSECA-FLEMING]\n"
+                       "f1 = 1-exp(-((x1-1/sqrt(4))^2+(x2-1/sqrt(4))^2+(x3-1/sqrt(4))^2+(x4-1/sqrt(4))^2))\n"
+                       "f2 = 1-exp(-((x1+1/sqrt(4))^2+(x2+1/sqrt(4))^2+(x3+1/sqrt(4))^2+(x4+1/sqrt(4))^2))");
     temp_list->item(0)->setBackground(Qt::lightGray);
 
-    temp_list->addItem("[Funkcja Changkonga-Haimesa]\n"
-                       "f1 = 2+(x1-2)^2+(x2-1)^2\n"
-                       "f2 = 9*x1-(x2-1)^2");
-    temp_list->addItem("[Funkcja Schaffera]\n"
+    temp_list->addItem("[KURSAWE]\n"
+                       "f1 = (-10*exp(-0.2*sqrt(x1^2+x2^2)))+(-10*exp(-0.2*sqrt(x2^2+x3^2)))\n"
+                       "f2 = (abs(x1)^(0.8)+5*sin(x1^3))+(abs(x2)^(0.8)+5*sin(x2^3))+(abs(x3)^(0.8)+5*sin(x3^3))");
+
+    temp_list->addItem("[SHAFFER]\n"
                        "f1 = x1^2\n"
                        "f2 = (x1-2)^2");
     temp_list->item(2)->setBackground(Qt::lightGray);
 
-    temp_list->addItem("[Funkcja CTP1]\n"
-                       "f1 = x1\n"
-                       "f2 = (1+x2)*exp(-x/(1+x2))");
-    temp_list->addItem("[Problem Constr-Ex]\n"
-                       "f1 = x1\n"
-                       "f2 = (1+x2)/x1");
-    temp_list->item(4)->setBackground(Qt::lightGray);
 
-    temp_list->addItem("[Funkcja testowa nr.4]\n"
-                       "f1 = x1^2-x2\n"
-                       "f2 = -0.5*x1-x2-1");
 }
 
 void LibraryWindow::fillPicList()
 {
     this->listPic.append(":/res/resources/images/empty.png");
-    this->listPic.append(":/res/resources/images/f1.png");
-    this->listPic.append(":/res/resources/images/f2.png");
+    this->listPic.append(":/res/resources/images/f1.jpg");
+    this->listPic.append(":/res/resources/images/f2.jpg");
     this->listPic.append(":/res/resources/images/f3.png");
-    this->listPic.append(":/res/resources/images/f4.png");
-    this->listPic.append(":/res/resources/images/f5.png");
-    this->listPic.append(":/res/resources/images/f6.png");
+    //this->listPic.append(":/res/resources/images/f5.png");
 }
 
 void LibraryWindow::sendFunctionToMain()

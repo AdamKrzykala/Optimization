@@ -21,13 +21,24 @@ class threadOperations
 
 public:
     threadOperations(Population,
-                     FunctionParser&,
-                     FunctionParser&);
+                     QMap< int, QString > _functionsPostures);
 
-    void parallelFunction();
+    void parallelFunction1();
+    void parallelFunction2();
+    void parallelFunction3();
+    void parallelFunction4();
 
-    std::thread parallelFunctionThread() {
-        return std::thread(&threadOperations::parallelFunction, this);
+    std::thread parallelFunctionThread1() {
+        return std::thread(&threadOperations::parallelFunction1, this);
+    }
+    std::thread parallelFunctionThread2() {
+        return std::thread(&threadOperations::parallelFunction2, this);
+    }
+    std::thread parallelFunctionThread3() {
+        return std::thread(&threadOperations::parallelFunction3, this);
+    }
+    std::thread parallelFunctionThread4() {
+        return std::thread(&threadOperations::parallelFunction4, this);
     }
 
     QVector<QVector<int>> returnDominated(){
@@ -43,8 +54,15 @@ private:
     QVector<QVector<int>> dominated;
     QVector<int> counters;
     Population t_population;
+    QVector<QPair<FunctionParser,FunctionParser>> FunctionContainer;
     FunctionParser *f1;
     FunctionParser *f2;
+    FunctionParser *f3;
+    FunctionParser *f4;
+    FunctionParser *f5;
+    FunctionParser *f6;
+    FunctionParser *f7;
+    FunctionParser *f8;
     int iteration;
 };
 

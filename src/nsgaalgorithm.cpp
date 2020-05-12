@@ -13,7 +13,7 @@ NSGAalgorithm::NSGAalgorithm(Borders borders,
     this->_borders = borders;
     this->function1 = new FunctionParser(functions[1]);
     this->function2 = new FunctionParser(functions[2]);
-    this->genetic_functions = new Allele(params);
+    this->genetic_functions = new Allele(params,functions);
     QVector<QPointF> temp = QVector<QPointF>(this->_params["Lp"],QPointF(0,0));
     this->history = QVector<QVector<QPointF>>(this->_params["Lg"],temp);
     //Initial Population Creating

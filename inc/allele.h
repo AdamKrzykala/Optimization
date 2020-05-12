@@ -53,7 +53,7 @@ class Allele : public QObject
 {
     Q_OBJECT
 public:
-    explicit    Allele(Parameters _params, QObject *parent = nullptr);
+    explicit    Allele(Parameters params, QMap< int, QString > functionsPostures, QObject *parent = nullptr);
 
     Population      initPopulation( Borders borders);
 
@@ -79,6 +79,7 @@ public:
 
 private:
     Parameters _params;
+    QMap< int, QString > _functionsPostures;
 };
 
 #endif // ALLELE_H

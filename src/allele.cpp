@@ -4,10 +4,12 @@
 #include <mutex>
 
 
-Allele::Allele(Parameters params, QObject *parent) : QObject(parent)
+Allele::Allele(Parameters params, QMap< int, QString > functionsPostures, QObject *parent) : QObject(parent)
 {
     this->_params = params;
+    this->_functionsPostures = functionsPostures;
 }
+
 
 Population Allele::initPopulation(Borders borders )
 {
@@ -108,16 +110,18 @@ Population Allele::binToPopulation( PopulationBin populationBin,
     return decoded_population;
 }
 
+
 Descendant Allele::cross2Parents(IndividualBin firstParent, IndividualBin secondParent)
 {
-    double cross_prob = this->_params["Pe"];
     GenotypeBin firstParentGenotype = firstParent.first;
+    int res = 0;
     GenotypeBin secondParentGenotype = secondParent.first;
     if (firstParentGenotype.second != secondParentGenotype.second)
         throw QString ("Unexpected dimension");
-    int allelDimension = firstParentGenotype.second;
+    else res = firstParentGenotype.second;
 
-
+    QString firstParentALLELS = firstParentGenotype.first;
+    QString secondParentALLELS = secondParentGenotype.first;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis( 0, 1 );
@@ -126,39 +130,66 @@ Descendant Allele::cross2Parents(IndividualBin firstParent, IndividualBin second
     static Adaptation temp_adaptation;
     temp_adaptation.insert("rank",0.0);
     temp_adaptation.insert("crowding",0.0);
-    newDescendant._descendantOne = IndividualBin(firstParentGenotype,temp_adaptation);
-    newDescendant._descendantTwo = IndividualBin(secondParentGenotype,temp_adaptation);
 
-//    Normal crossing
-//    for (int i = 0; i < firstParentGenotype.first.size()/allelDimension; i++)
+    int cutPlace = floor(dis(gen)*firstParentALLELS.size());
+    newDescendant._descendantOne = IndividualBin(GenotypeBin(firstParentALLELS.left(cutPlace)
+                                                             + secondParentALLELS.mid(cutPlace),res),temp_adaptation);
+    newDescendant._descendantTwo = IndividualBin(GenotypeBin(secondParentALLELS.left(cutPlace)
+                                                             + firstParentALLELS.mid(cutPlace),res),temp_adaptation);
+    return newDescendant;
+}
+
+//Descendant Allele::cross2Parents(IndividualBin firstParent, IndividualBin secondParent)
+//{
+//    double cross_prob = this->_params["Pe"];
+//    GenotypeBin firstParentGenotype = firstParent.first;
+//    GenotypeBin secondParentGenotype = secondParent.first;
+//    if (firstParentGenotype.second != secondParentGenotype.second)
+//        throw QString ("Unexpected dimension");
+//    int allelDimension = firstParentGenotype.second;
+
+
+//    std::random_device rd;
+//    std::mt19937 gen(rd());
+//    std::uniform_real_distribution<> dis( 0, 1 );
+
+//    Descendant newDescendant;
+//    static Adaptation temp_adaptation;
+//    temp_adaptation.insert("rank",0.0);
+//    temp_adaptation.insert("crowding",0.0);
+//    newDescendant._descendantOne = IndividualBin(firstParentGenotype,temp_adaptation);
+//    newDescendant._descendantTwo = IndividualBin(secondParentGenotype,temp_adaptation);
+
+////    Normal crossing
+////    for (int i = 0; i < firstParentGenotype.first.size()/allelDimension; i++)
+////    {
+////        int start_pos = i*allelDimension+1;
+////        if(dis(gen) < cross_prob){
+////            newDescendant._descendantOne.first.first.replace(start_pos,
+////                                                             allelDimension,
+////                                                             secondParentGenotype.first.mid(start_pos,allelDimension));
+////        }
+////        if(dis(gen) < cross_prob){
+////            newDescendant._descendantTwo.first.first.replace(start_pos,
+////                                                             allelDimension,
+////                                                             firstParentGenotype.first.mid(start_pos,allelDimension));
+////        }
+////    }
+
+////   Homongeus crossing
+//    for(int i(0); i<allelDimension; i++)
 //    {
-//        int start_pos = i*allelDimension+1;
-//        if(dis(gen) < cross_prob){
-//            newDescendant._descendantOne.first.first.replace(start_pos,
-//                                                             allelDimension,
-//                                                             secondParentGenotype.first.mid(start_pos,allelDimension));
-//        }
-//        if(dis(gen) < cross_prob){
-//            newDescendant._descendantTwo.first.first.replace(start_pos,
-//                                                             allelDimension,
-//                                                             firstParentGenotype.first.mid(start_pos,allelDimension));
+//        if(dis(gen) <= cross_prob){
+//            newDescendant._descendantOne.first.first.replace(i, 1, firstParentGenotype.first.at(i));
+//            newDescendant._descendantTwo.first.first.replace(i, 1, secondParentGenotype.first.at(i));
+//        }else {
+//            newDescendant._descendantOne.first.first.replace(i, 1, secondParentGenotype.first.at(i));
+//            newDescendant._descendantTwo.first.first.replace(i, 1, firstParentGenotype.first.at(i));
 //        }
 //    }
 
-//   Homongeus crossing
-    for(int i(0); i<allelDimension; i++)
-    {
-        if(dis(gen) <= cross_prob){
-            newDescendant._descendantOne.first.first.replace(i, 1, firstParentGenotype.first.at(i));
-            newDescendant._descendantTwo.first.first.replace(i, 1, secondParentGenotype.first.at(i));
-        }else {
-            newDescendant._descendantOne.first.first.replace(i, 1, secondParentGenotype.first.at(i));
-            newDescendant._descendantTwo.first.first.replace(i, 1, firstParentGenotype.first.at(i));
-        }
-    }
-
-    return newDescendant;
-}
+//    return newDescendant;
+//}
 
 //Tournament Selection Function
 IndividualBin   Allele::choose1Parent( PopulationBin parentPopulation)
@@ -186,16 +217,23 @@ IndividualBin   Allele::choose1Parent( PopulationBin parentPopulation)
 //Crossing Function
 PopulationBin Allele::crossing(PopulationBin parentPopulation)
 {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis( 0, 1 );
     PopulationBin tempPopulation;
     while(tempPopulation.size() != parentPopulation.size())
     {
         IndividualBin firstParent = this->choose1Parent( parentPopulation );
         IndividualBin secondParent = this->choose1Parent( parentPopulation );
         Descendant descendant = this->cross2Parents( firstParent, secondParent );
-        tempPopulation.append(firstParent);
-        tempPopulation.append(secondParent);
-        tempPopulation.append(descendant._descendantOne);
-        tempPopulation.append(descendant._descendantTwo);
+        if (dis(gen) <= this->_params["pe"]){
+            tempPopulation.append(descendant._descendantOne);
+            tempPopulation.append(descendant._descendantTwo);
+        }
+        else {
+            tempPopulation.append(firstParent);
+            tempPopulation.append(secondParent);
+        }
     }
     return tempPopulation;
 }
@@ -261,6 +299,14 @@ int secondMinValue(QVector<int> counters)
     return minValue;
 }
 
+inline bool checkIfTheSame(const Individual &i1, const Individual &i2)
+{
+    for (int i = 0; i < i1.first.size(); i++){
+        if (i1.first[i] != i2.first[i]) return false;
+    }
+    return true;
+}
+
 Population Allele::frontedPopulation(Population t_population, FunctionParser &f1, FunctionParser &f2, Borders borders)
 {
     int pop_size = t_population.size();
@@ -268,11 +314,12 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     Population fronted_population;
 
     //Calculating dependanties
-    threadOperations *threadProcess = new threadOperations(t_population,f1,f2);
-    std::thread tw1 = threadProcess->parallelFunctionThread();
-    std::thread tw2 = threadProcess->parallelFunctionThread();
-    std::thread tw3 = threadProcess->parallelFunctionThread();
-    std::thread tw4 = threadProcess->parallelFunctionThread();
+    threadOperations *threadProcess = new threadOperations(t_population,
+                                                           this->_functionsPostures);
+    std::thread tw1 = threadProcess->parallelFunctionThread1();
+    std::thread tw2 = threadProcess->parallelFunctionThread2();
+    std::thread tw3 = threadProcess->parallelFunctionThread3();
+    std::thread tw4 = threadProcess->parallelFunctionThread4();
 
     tw1.join();
     tw2.join();
@@ -333,6 +380,22 @@ Population Allele::frontedPopulation(Population t_population, FunctionParser &f1
     return fronted_population;
     }
 
+double NSGA_Split_Function(Individual I1, Individual I2, int alpha, double sigma, FunctionParser &f1, FunctionParser &f2)
+{
+    double d_ij = 0;
+    double sd_ij = 0;
+    d_ij = pow((f1.getValue(I1.first)-f1.getValue(I2.first)),2);
+    d_ij += pow((f2.getValue(I1.first)-f2.getValue(I2.first)),2);
+    d_ij = sqrt(d_ij);
+
+    if (d_ij < sigma){
+        sd_ij = 1 - pow((d_ij/sigma),alpha);
+    }
+    else {
+        sd_ij = 0;
+    }
+    return sd_ij;
+}
 
 Population Allele::calculateCrowding(Population &t_population, FunctionParser &f1, FunctionParser &f2)
 {
@@ -356,54 +419,27 @@ Population Allele::calculateCrowding(Population &t_population, FunctionParser &f
         Population currentFront;
         for (int i = 0; i < t_population.size(); i++){
             if (t_population[i].second["rank"] == fronts[mainLoopIter]){
+                t_population[i].second["crowding"] = 100000;
                 currentFront.append(t_population[i]);
             }
         }
         //Now currentFront holds all of Individuals from one front
-        //Getting values of function1 for current front
-        QVector<FunctionIndicator> functionValues1;
-        for(int i = 0; i < currentFront.size(); ++i)
-        {
-            FunctionIndicator oneFunc;
-            oneFunc.index = i;
-            oneFunc.function_value = f1.getValue(currentFront[i].first);
-            functionValues1.append(oneFunc);
-        }
-
-        QVector<FunctionIndicator> functionValues2;
-        for(int i = 0; i < currentFront.size(); ++i)
-        {
-            FunctionIndicator oneFunc;
-            oneFunc.index = i;
-            oneFunc.function_value = f2.getValue(currentFront[i].first);
-            functionValues2.append(oneFunc);
-        }
-
-        // sorting non-descending order all calculated values
-        std::sort(functionValues1.begin(), functionValues1.end());
-        std::sort(functionValues2.begin(), functionValues2.end());
-
-        //Crowding distance for min value f1 to inf set
-        currentFront[functionValues1.first().index].second["crowding"] = INFINITY;
-        //Crowding distance for min value f2 to inf set
-        currentFront[functionValues2.first().index].second["crowding"] = INFINITY;
-
-        double delta1 = functionValues1.last().function_value - functionValues1.first().function_value;
-        double delta2 = functionValues2.last().function_value - functionValues2.first().function_value;
-
-        // calculating crowding for first function; indexes witgout margin values
-        for(int i = 1; i < currentFront.size()-1; ++i)
-        {
-            if (!(delta1 == 0)){
-                currentFront[functionValues1[i].index].second["crowding"] = currentFront[functionValues1[i].index].second["crowding"]
-                        + (functionValues1[i+1].function_value-functionValues1[i-1].function_value)/delta1;
+        //Getting values of functions for current front
+        double sigma = 0.5;
+        int alpha = 1;
+        for (int i = 0; i < currentFront.size(); i++){
+            Individual I_temp = currentFront[i];
+            int distanceSum = 0;
+            for (int j = 0; j < currentFront.size(); j++){
+                Individual J_temp = currentFront[j];
+                if (i != j){
+                    distanceSum += NSGA_Split_Function(I_temp,J_temp,alpha,sigma, f1, f2);
+                }
             }
-            if (!(delta2 == 0)){
-                currentFront[functionValues2[i].index].second["crowding"] = currentFront[functionValues2[i].index].second["crowding"]
-                        + (functionValues2[i+1].function_value-functionValues2[i-1].function_value)/delta2;
+            if (distanceSum != 0){
+                currentFront[i].second["crowding"] = currentFront[i].second["crowding"] / distanceSum;
             }
         }
-
 
         //Sorting is not urgent
         //Copying to output population
@@ -416,4 +452,3 @@ Population Allele::calculateCrowding(Population &t_population, FunctionParser &f
     }
     return OutputPopulation;
 }
-
