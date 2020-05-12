@@ -130,31 +130,31 @@ Descendant Allele::cross2Parents(IndividualBin firstParent, IndividualBin second
     newDescendant._descendantTwo = IndividualBin(secondParentGenotype,temp_adaptation);
 
     //old crossing
-    for (int i = 0; i < firstParentGenotype.first.size()/allelDimension; i++)
-    {
-        int start_pos = i*allelDimension+1;
-        if(dis(gen) < cross_prob){
-            newDescendant._descendantOne.first.first.replace(start_pos,
-                                                             allelDimension,
-                                                             secondParentGenotype.first.mid(start_pos,allelDimension));
-        }
-        if(dis(gen) < cross_prob){
-            newDescendant._descendantTwo.first.first.replace(start_pos,
-                                                             allelDimension,
-                                                             firstParentGenotype.first.mid(start_pos,allelDimension));
-        }
-    }
-
-//    for (int i(0); i < allelDimension; ++i)
+//    for (int i = 0; i < firstParentGenotype.first.size()/allelDimension; i++)
 //    {
-//        if(dis(gen) <= cross_prob){
-//            newDescendant._descendantOne.first.first.replace(i, 1, firstParentGenotype.first.at(i));
-//            newDescendant._descendantTwo.first.first.replace(i, 1, secondParentGenotype.first.at(i));
-//        }else{
-//            newDescendant._descendantOne.first.first.replace(i, 1, secondParentGenotype.first.at(i));
-//            newDescendant._descendantTwo.first.first.replace(i, 1, firstParentGenotype.first.at(i));
+//        int start_pos = i*allelDimension+1;
+//        if(dis(gen) < cross_prob){
+//            newDescendant._descendantOne.first.first.replace(start_pos,
+//                                                             allelDimension,
+//                                                             secondParentGenotype.first.mid(start_pos,allelDimension));
+//        }
+//        if(dis(gen) < cross_prob){
+//            newDescendant._descendantTwo.first.first.replace(start_pos,
+//                                                             allelDimension,
+//                                                             firstParentGenotype.first.mid(start_pos,allelDimension));
 //        }
 //    }
+
+    for (int i(0); i < allelDimension; ++i)
+    {
+        if(dis(gen) <= cross_prob){
+            newDescendant._descendantOne.first.first.replace(i, 1, firstParentGenotype.first.at(i));
+            newDescendant._descendantTwo.first.first.replace(i, 1, secondParentGenotype.first.at(i));
+        }else{
+            newDescendant._descendantOne.first.first.replace(i, 1, secondParentGenotype.first.at(i));
+            newDescendant._descendantTwo.first.first.replace(i, 1, firstParentGenotype.first.at(i));
+        }
+    }
     return newDescendant;
 }
 
