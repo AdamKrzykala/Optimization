@@ -142,6 +142,17 @@ Descendant Allele::cross2Parents(IndividualBin firstParent, IndividualBin second
                                                              firstParentGenotype.first.mid(start_pos,allelDimension));
         }
     }
+
+//    for (int i(0); i < allelDimension; ++i)
+//    {
+//        if(dis(gen) <= cross_prob){
+//            newDescendant._descendantOne.first.first.replace(i, 1, firstParentGenotype.first.at(i));
+//            newDescendant._descendantTwo.first.first.replace(i, 1, secondParentGenotype.first.at(i));
+//        }else{
+//            newDescendant._descendantOne.first.first.replace(i, 1, secondParentGenotype.first.at(i));
+//            newDescendant._descendantTwo.first.first.replace(i, 1, firstParentGenotype.first.at(i));
+//        }
+//    }
     return newDescendant;
 }
 

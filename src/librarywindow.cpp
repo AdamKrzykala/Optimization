@@ -87,6 +87,12 @@ void LibraryWindow::addFunctions(QListWidget *temp_list)
 
     temp_list->addItem("[Funkcja celu szczególnie przeznaczona do testowaniaalgorytmów genetycznych]\n"
                        "sin(5.1*pi*x+0.5)^6");
+    temp_list->addItem("[F1 dla f. Birtha-Korna]\n"
+                       "4*x1^2+4*x2^2");
+    temp_list->item(10)->setBackground(Qt::lightGray);
+
+    temp_list->addItem("[F2 dla f. Birtha-Korna]\n"
+                       "(x1-5)^2+(x2-5)^2");
 }
 
 void LibraryWindow::fillPicList()
@@ -102,6 +108,9 @@ void LibraryWindow::fillPicList()
     this->listPic.append(":/res/resources/images/f8.png");
     this->listPic.append(":/res/resources/images/f9.png");
     this->listPic.append(":/res/resources/images/f10.png");
+    this->listPic.append(":/res/resources/images/empty.png");
+    this->listPic.append(":/res/resources/images/empty.png");
+
 }
 
 void LibraryWindow::sendFunctionToMain()
