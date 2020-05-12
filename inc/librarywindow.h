@@ -17,9 +17,7 @@ public:
 
 private:
     QListWidget *f1List;
-    QListWidget *f2List;
     QLabel *pix1;
-    QLabel *pix2;
 
     QStringList listPic;
 
@@ -34,7 +32,6 @@ public slots:
 
 private slots:
     void on_ItemF1Selected(int);
-    void on_ItemF2Selected(int);
 };
 
 #endif // LIBRARYWINDOW_H
