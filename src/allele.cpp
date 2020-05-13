@@ -192,18 +192,18 @@ Descendant Allele::cross2Parents(IndividualBin firstParent, IndividualBin second
 //}
 
 //Tournament Selection Function
+
 IndividualBin   Allele::choose1Parent( PopulationBin parentPopulation)
 {
-    IndividualBin temp_parent;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis( 0, parentPopulation.size() );
     IndividualBin firstCandidate = parentPopulation[floor(dis(gen))];
     IndividualBin secondCandidate = parentPopulation[floor(dis(gen))];
 
-    if (firstCandidate.second["rank"] > secondCandidate.second["rank"])
+    if (firstCandidate.second["rank"] < secondCandidate.second["rank"])
         return firstCandidate;
-    else if (firstCandidate.second["rank"] < secondCandidate.second["rank"])
+    else if (firstCandidate.second["rank"] > secondCandidate.second["rank"])
         return secondCandidate;
     else {
         if (firstCandidate.second["crowding"] > secondCandidate.second["crowding"])
@@ -425,7 +425,7 @@ Population Allele::calculateCrowding(Population &t_population, FunctionParser &f
         }
         //Now currentFront holds all of Individuals from one front
         //Getting values of functions for current front
-        double sigma = 0.5;
+        double sigma = 0.01;
         int alpha = 1;
         for (int i = 0; i < currentFront.size(); i++){
             Individual I_temp = currentFront[i];
