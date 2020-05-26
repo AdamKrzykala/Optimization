@@ -1,12 +1,5 @@
 <RCC>
-    <qresource prefix="/res">
-        <file>resources/images/logo.png</file>
-        <file>resources/images/empty.png</file>
-        <file>resources/images/f3.png</file>
-        <file>resources/images/f5.png</file>
-        <file>resources/images/f6.png</file>
-        <file>resources/images/f1.jpg</file>
-        <file>resources/images/f2.jpg</file>
-        <file>resources/images/f4.jpg</file>
+    <qresource prefix="/">
+        <file>logo.png</file>
     </qresource>
 </RCC>

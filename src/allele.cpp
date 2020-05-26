@@ -1,454 +1,496 @@
-#include "allele.h"
-#include <ctime>
-#include <thread>
-#include <mutex>
+#include "allele.hpp"
 
+Math_Parser Parser;
 
-Allele::Allele(Parameters params, QMap< int, QString > functionsPostures, QObject *parent) : QObject(parent)
-{
-    this->_params = params;
-    this->_functionsPostures = functionsPostures;
+// --------------------------------------------------------------------
+
+Individual initOneIndividual(int genotypeLength,
+                             int fenotypeLength,
+                             int functionAmount) {
+
+    Individual newMember;
+
+    newMember.Genotypes_Size = genotypeLength;
+    newMember.Fenotypes_Size = fenotypeLength;
+    newMember.Goals_Size = functionAmount;
+
+    newMember.Genotypes = new string[ genotypeLength ];
+    newMember.Fenotypes = new float[ fenotypeLength ];
+    newMember.Goals     = new float[ functionAmount ];
+
+    newMember.Fitness = 0;
+    newMember.Drawn_Probability = 0;
+
+    return newMember;
 }
 
+// --------------------------------------------------------------------
 
-Population Allele::initPopulation(Borders borders )
+void Individual_Genotypes_Decoding(Individual *singleIndividual,
+                                   vector<float> minValues,
+                                   vector<float> maxValues)
 {
-    Genotype temp_genotype(this->_params["n"], 0.0);
-    static Adaptation temp_adaptation;
-    temp_adaptation.insert("rank",0.0);
-    temp_adaptation.insert("crowding",0.0);
-    Population temp_population(this->_params["Lp"],
-            Individual(temp_genotype, temp_adaptation));
 
-    std::random_device rd;      //Will be used to obtain a seed for the random number engine
-    std::mt19937 gen(rd());     //Standard mersenne_twister_engine seeded with rd()
+    string s = "";
+    unsigned long long x = 0;
+    float d = 0;
 
-    for(int j = 0; j < this->_params["n"]; j++){
-        std::uniform_real_distribution<> dis(borders[j].first,borders[j].second);
-            for (int i = 0; i < this->_params["Lp"]; i++) {
-                temp_population[i].first[j] = dis(gen);
-            }
-    }
-    return temp_population;
-}
+    for(int i = 0; i < singleIndividual->Genotypes_Size; ++i) {
 
-PopulationBin Allele::populationToBin( Population population,
-                                       Borders borders)
-{
-    int res = 4;        // coding resolution
-    int b = -1;
+        s = singleIndividual->Genotypes[i];
 
-    PopulationBin encoded_population;
-
-    for (auto i : borders)
-    {
-        int new_b = ceil(log2((i.second - i.first)*(pow(10,res)) + 1 ));
-        if( new_b > 64 ) throw QString("Binary size overflow");     // throwing exception if cannot convert in given limit
-
-        if ( b < new_b) b = new_b;      // finding biggest needed quantity of bits
-    }
-
-    for( int i = 0; i < population.size(); i++ )
-    {
-        Adaptation temp_adaptation = population.at(i).second;
-        QString chromosome;
-        for( int j = 0; j < (population.at(i).first.size()); j++ )
-        {
-            QString temp_gen;
-            qlonglong temp_val;
-
-            temp_val = static_cast<qlonglong>((population.at(i).first.at(j)-borders.at(j).first)*(static_cast<double>(pow(10,res))));
-            temp_gen.setNum(temp_val, 2);
-
-            int loop_length = b - temp_gen.size();
-            for(int k = 0; k < loop_length; k++ )
-            {
-                temp_gen.prepend('0');
-            }
-            chromosome.append(temp_gen);
-        }
-        GenotypeBin temp_genotype(chromosome,b);
-        encoded_population.append(IndividualBin(temp_genotype,temp_adaptation));
-    }
-
-    return encoded_population;
-}
-
-Population Allele::binToPopulation( PopulationBin populationBin,
-                                    Borders borders)
-{
-    Population decoded_population;
-
-    for( int i = 0 ; i < populationBin.size(); i++ )
-    {
-        Adaptation temp_adaptation = populationBin.at(i).second;
-        QString chromosome_b2 = populationBin.at(i).first.first;
-        int bits = populationBin.at(i).first.second;
-
-        bool con_flag;      // flag of conversion from binary to decimal
-        Genotype chromosome_b10;
-
-        int j = 0;
-
-        while(1)
-        {
-            QString gene_b2 = chromosome_b2.mid(0, bits);
-            chromosome_b2.remove(0, bits);
-            qlonglong gene = gene_b2.toLongLong(&con_flag, 2);
-
-            if(!con_flag) throw QString("Conversion from binary to longlong was not succesful");
-
-            T temp_gene = (gene/pow(10,4))+borders.at(j).first;
-            chromosome_b10.append((double)temp_gene);
-
-            if(!chromosome_b2.size()) break;
-            ++j;
+        for (string::const_iterator i = s.begin(); i != s.end(); ++i) {
+            x = (x << 1) + (*i - '0');
         }
 
-    decoded_population.append(Individual(chromosome_b10,temp_adaptation));
+        memcpy(&d, &x, sizeof(float));
+
+        float min = minValues[i];
+        float max = maxValues[i];
+
+        if(d > max) {
+
+            d = max;
+            singleIndividual->Fenotypes[i] = d;
+            Individual_Fenotypes_Coding(singleIndividual);
+            continue;
+        }
+        else if(d < min) {
+
+            d = min;
+            singleIndividual->Fenotypes[i] = d;
+            Individual_Fenotypes_Coding(singleIndividual);
+            continue;
+        }
+        else if( isnan(d) ) {
+
+            d = min;
+            singleIndividual->Fenotypes[i] = d;
+            Individual_Fenotypes_Coding(singleIndividual);
+            continue;
+        }
+
+        singleIndividual->Fenotypes[i] = d;
     }
-    return decoded_population;
 }
 
+// --------------------------------------------------------------------
 
-Descendant Allele::cross2Parents(IndividualBin firstParent, IndividualBin secondParent)
-{
-    GenotypeBin firstParentGenotype = firstParent.first;
-    int res = 0;
-    GenotypeBin secondParentGenotype = secondParent.first;
-    if (firstParentGenotype.second != secondParentGenotype.second)
-        throw QString ("Unexpected dimension");
-    else res = firstParentGenotype.second;
+void Individual_Fenotypes_Coding(Individual *singleIndividual) {
 
-    QString firstParentALLELS = firstParentGenotype.first;
-    QString secondParentALLELS = secondParentGenotype.first;
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis( 0, 1 );
+    string s = "";
+    float d = 0;
 
-    Descendant newDescendant;
-    static Adaptation temp_adaptation;
-    temp_adaptation.insert("rank",0.0);
-    temp_adaptation.insert("crowding",0.0);
+    for (int i = 0; i < singleIndividual->Fenotypes_Size; ++i) {
 
-    int cutPlace = floor(dis(gen)*firstParentALLELS.size());
-    newDescendant._descendantOne = IndividualBin(GenotypeBin(firstParentALLELS.left(cutPlace)
-                                                             + secondParentALLELS.mid(cutPlace),res),temp_adaptation);
-    newDescendant._descendantTwo = IndividualBin(GenotypeBin(secondParentALLELS.left(cutPlace)
-                                                             + firstParentALLELS.mid(cutPlace),res),temp_adaptation);
-    return newDescendant;
+        d = singleIndividual->Fenotypes[i];
+
+        s = bitset<sizeof d * 8>( *(long unsigned int*)(&d) ).to_string();
+        singleIndividual->Genotypes[i] = s;
+    }
 }
 
-//Descendant Allele::cross2Parents(IndividualBin firstParent, IndividualBin secondParent)
-//{
-//    double cross_prob = this->_params["Pe"];
-//    GenotypeBin firstParentGenotype = firstParent.first;
-//    GenotypeBin secondParentGenotype = secondParent.first;
-//    if (firstParentGenotype.second != secondParentGenotype.second)
-//        throw QString ("Unexpected dimension");
-//    int allelDimension = firstParentGenotype.second;
+// --------------------------------------------------------------------
 
+Descendant *Individual_Crossing(Individual i1,
+                                Individual i2,
+                                int pe,
+                                vector<float> search_domain_min,
+                                vector<float> search_domain_max) {
 
-//    std::random_device rd;
-//    std::mt19937 gen(rd());
-//    std::uniform_real_distribution<> dis( 0, 1 );
+    Descendant *descendant = new Descendant();
+    descendant->firstDescendant = initOneIndividual( i1.Genotypes_Size,
+                                                     i1.Fenotypes_Size,
+                                                     i1.Goals_Size );
 
-//    Descendant newDescendant;
-//    static Adaptation temp_adaptation;
-//    temp_adaptation.insert("rank",0.0);
-//    temp_adaptation.insert("crowding",0.0);
-//    newDescendant._descendantOne = IndividualBin(firstParentGenotype,temp_adaptation);
-//    newDescendant._descendantTwo = IndividualBin(secondParentGenotype,temp_adaptation);
+    descendant->secondDescendant = initOneIndividual( i1.Genotypes_Size,
+                                                      i1.Fenotypes_Size,
+                                                      i1.Goals_Size );
 
-////    Normal crossing
-////    for (int i = 0; i < firstParentGenotype.first.size()/allelDimension; i++)
-////    {
-////        int start_pos = i*allelDimension+1;
-////        if(dis(gen) < cross_prob){
-////            newDescendant._descendantOne.first.first.replace(start_pos,
-////                                                             allelDimension,
-////                                                             secondParentGenotype.first.mid(start_pos,allelDimension));
-////        }
-////        if(dis(gen) < cross_prob){
-////            newDescendant._descendantTwo.first.first.replace(start_pos,
-////                                                             allelDimension,
-////                                                             firstParentGenotype.first.mid(start_pos,allelDimension));
-////        }
-////    }
+    int Rand_Propability_Temp = rand() % 100;
 
-////   Homongeus crossing
-//    for(int i(0); i<allelDimension; i++)
-//    {
-//        if(dis(gen) <= cross_prob){
-//            newDescendant._descendantOne.first.first.replace(i, 1, firstParentGenotype.first.at(i));
-//            newDescendant._descendantTwo.first.first.replace(i, 1, secondParentGenotype.first.at(i));
-//        }else {
-//            newDescendant._descendantOne.first.first.replace(i, 1, secondParentGenotype.first.at(i));
-//            newDescendant._descendantTwo.first.first.replace(i, 1, firstParentGenotype.first.at(i));
-//        }
-//    }
+    if(Rand_Propability_Temp <= pe) {
 
-//    return newDescendant;
-//}
+        string Genotype1_Temp;
+        string Genotype2_Temp;
 
-//Tournament Selection Function
+        string New_Genotype_Temp1;
+        string New_Genotype_Temp2;
 
-IndividualBin   Allele::choose1Parent( PopulationBin parentPopulation)
-{
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis( 0, parentPopulation.size() );
-    IndividualBin firstCandidate = parentPopulation[floor(dis(gen))];
-    IndividualBin secondCandidate = parentPopulation[floor(dis(gen))];
+        int Rand_Temp = rand() % ( i1.Genotypes_Size * ( 8 * sizeof(float) ) );
 
-    if (firstCandidate.second["rank"] < secondCandidate.second["rank"])
-        return firstCandidate;
-    else if (firstCandidate.second["rank"] > secondCandidate.second["rank"])
-        return secondCandidate;
+        for(int i = 0; i < i1.Genotypes_Size && i < i2.Genotypes_Size; ++i) {
+
+            New_Genotype_Temp1.clear();
+            New_Genotype_Temp2.clear();
+
+            Genotype1_Temp = i1.Genotypes[i];
+            Genotype2_Temp = i2.Genotypes[i];
+
+            for(int j = 0; j < (int)( 8 * sizeof(float) ); ++j ) {
+
+                if (i < Rand_Temp) {
+
+                    New_Genotype_Temp1 += Genotype1_Temp[j];
+                    New_Genotype_Temp2 += Genotype2_Temp[j];
+                }
+                else {
+
+                    New_Genotype_Temp1 += Genotype2_Temp[j];
+                    New_Genotype_Temp2 += Genotype1_Temp[j];
+                }
+            }
+
+            descendant->firstDescendant.Genotypes[i] = New_Genotype_Temp1;
+            descendant->secondDescendant.Genotypes[i] = New_Genotype_Temp2;
+
+            Individual_Genotypes_Decoding(&descendant->firstDescendant,
+                                          search_domain_min,
+                                          search_domain_max);
+
+            Individual_Genotypes_Decoding(&descendant->secondDescendant,
+                                          search_domain_min,
+                                          search_domain_max);
+        }
+    }
     else {
-        if (firstCandidate.second["crowding"] > secondCandidate.second["crowding"])
-            return firstCandidate;
-        else if (firstCandidate.second["crowding"] < secondCandidate.second["crowding"])
-            return secondCandidate;
+
+        descendant->firstDescendant = i1;
+        descendant->secondDescendant = i2;
     }
-    return firstCandidate;
+
+    return descendant;
 }
 
-//Crossing Function
-PopulationBin Allele::crossing(PopulationBin parentPopulation)
-{
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis( 0, 1 );
-    PopulationBin tempPopulation;
-    while(tempPopulation.size() != parentPopulation.size())
-    {
-        IndividualBin firstParent = this->choose1Parent( parentPopulation );
-        IndividualBin secondParent = this->choose1Parent( parentPopulation );
-        Descendant descendant = this->cross2Parents( firstParent, secondParent );
-        if (dis(gen) <= this->_params["pe"]){
-            tempPopulation.append(descendant._descendantOne);
-            tempPopulation.append(descendant._descendantTwo);
+// --------------------------------------------------------------------
+
+Individual Individual_Mutation(Individual i1,
+                               int m_probability,
+                               vector<float> search_domain_min,
+                               vector<float> search_domain_max) {
+
+    Individual New_I = initOneIndividual( i1.Genotypes_Size, i1.Genotypes_Size, i1.Goals_Size );
+
+    for(int i = 0; i < i1.Genotypes_Size; ++i) {
+
+        string New_Genotype_Temp;
+
+        for(int j = 0; j < (int)i1.Genotypes[i].length(); ++j) {
+
+            int Rand_Temp = rand() % 100;
+
+            if(Rand_Temp < m_probability) {
+
+                if(i1.Genotypes[i][j] == '0') New_Genotype_Temp += '1';
+                else New_Genotype_Temp += '0';
+            }
+            else {
+
+                New_Genotype_Temp += i1.Genotypes[i][j];
+            }
+        }
+
+        New_I.Genotypes[i] = New_Genotype_Temp;
+        Individual_Genotypes_Decoding(&New_I, search_domain_min, search_domain_max);
+    }
+
+    return New_I;
+}
+
+// --------------------------------------------------------------------
+
+float Individual_Adaptation(Individual i1, string adaptation_function) {
+
+    float Adaptation;
+
+    Parser.Math_Parser_Add_Expression(adaptation_function);
+
+    for (int i = 0; i < i1.Fenotypes_Size; ++i) {
+
+        Parser.Math_Parser_Add_Variable("x" + to_string(i+1), i1.Fenotypes[i]);
+    }
+
+    Parser.Math_Parser_Calculate();
+
+    Adaptation = Parser.Math_Parser_Get_Expression_Value();
+
+    Parser.Math_Parser_Clear_Expression();
+
+    return Adaptation;
+}
+
+// --------------------------------------------------------------------
+
+bool operator > (Individual i1, Individual i2) {
+
+    for(int i = 0; i < i1.Goals_Size && i < i2.Goals_Size; ++i) {
+
+        if( i1.Goals[i] < i2.Goals[i] ) {
+
+            return false;
+        }
+        else if( i1.Goals[i] == i2.Goals[i] ) {
+
+            for(int j = i + 1; j < i1.Goals_Size && j < i2.Goals_Size; ++j) {
+
+                if( i1.Goals[j] <= i2.Goals[j] ) {
+
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+// --------------------------------------------------------------------
+
+Allele::Allele() {
+
+}
+
+// --------------------------------------------------------------------
+
+Allele::~Allele() {
+
+    Individuals.clear();
+    border_max.clear();
+    border_min.clear();
+    Goal_Functions.clear();
+}
+
+// --------------------------------------------------------------------
+
+void Allele::initPopulation(float min, float max) {
+
+    min *= 10000;
+    max *= 10000;
+
+    for(int i = 0; i < this->_params["Lp"]; ++i) {
+
+        Individual I_Temp = initOneIndividual( Size, Size, Population_Get_Goal_Functions_Number() );
+
+        for (int j = 0; j < Size; j++) {
+            float Fenotype_Rand = (rand() % (int)max) + (int)min;
+            I_Temp.Fenotypes[j] = Fenotype_Rand / 10000;
+        }
+        Individual_Fenotypes_Coding(&I_Temp);
+        Individuals.append(I_Temp);
+    }
+}
+
+// --------------------------------------------------------------------
+
+void Allele::Population_Set_Search_Domain(float min, float max) {
+
+    border_min.push_back(min);
+    border_max.push_back(max);
+}
+
+// --------------------------------------------------------------------
+
+void Allele::Population_Set_Goal_Function(string goal_function) {
+
+    Goal_Functions.push_back(goal_function);
+}
+
+// --------------------------------------------------------------------
+
+string Allele::Population_Get_Goal_Function(int index) {
+
+    if( index < (int)Goal_Functions.size() ) {
+
+        return Goal_Functions[index];
+    }
+    else {
+
+        return 0;
+    }
+}
+
+// --------------------------------------------------------------------
+
+void Allele::Population_Set_Individual(Individual i1) {
+
+    Individuals.append(i1);
+}
+
+// --------------------------------------------------------------------
+
+Individual Allele::Population_Get_Individual(int index) {
+
+    return Individuals[index];
+}
+
+// --------------------------------------------------------------------
+
+void Allele::Population_Set_Fitness(float fitness, int index) {
+
+    Individuals[index].Fitness = fitness;
+}
+
+// --------------------------------------------------------------------
+
+void Allele::Population_Adaptation_Update() {
+
+    for(int i = 0; i < (int)Individuals.size(); ++i) {
+
+        Individual I_Temp = Individuals[i];
+
+        for(int j = 0; j < (int)Goal_Functions.size(); ++j) {
+
+            string Goal_Function_Temp = Goal_Functions[j];
+
+            float adaptation = Individual_Adaptation(I_Temp, Goal_Function_Temp);
+            Individuals[i].Goals[j] = adaptation;
+        }
+    }
+}
+
+// --------------------------------------------------------------------
+
+Allele Allele::Population_Recombination() {
+
+    Allele New_Population;
+    New_Population.Population_Set_Parameters(Size, this->_params["Lp"], this->_params["pe"], this->_params["pm"]);
+    New_Population.Goal_Functions       = Goal_Functions;
+    New_Population.border_min           = border_min;
+    New_Population.border_max           = border_max;
+
+    Descendant *descendant = new Descendant();
+    Individual Temp_i, Temp_j, Temp_k, Temp_l;
+
+    int PSize = (int)Individuals.size();
+
+    int Temp_Rand_1 = 0;
+    int Temp_Rand_2 = 0;
+
+    for(int i = 0; i < PSize / 2; ++i) {
+
+        // Step 1: Crossover
+        Temp_Rand_1 = 0;
+        Temp_Rand_2 = 0;
+
+        do {
+
+            Temp_Rand_1 = rand() % Individuals.size();
+            Temp_Rand_2 = rand() % Individuals.size();
+
+        } while( Temp_Rand_1 == Temp_Rand_2 );
+
+        Temp_i = Individuals[Temp_Rand_1];
+        Temp_j = Individuals[Temp_Rand_2];
+
+        if( Temp_Rand_1 > Temp_Rand_2 ) {
+
+            Individuals.erase(Individuals.begin() + Temp_Rand_1);
+            Individuals.erase(Individuals.begin() + Temp_Rand_2);
         }
         else {
-            tempPopulation.append(firstParent);
-            tempPopulation.append(secondParent);
+
+            Individuals.erase(Individuals.begin() + Temp_Rand_2);
+            Individuals.erase(Individuals.begin() + Temp_Rand_1);
         }
+
+        descendant = Individual_Crossing(Temp_i, Temp_j, this->_params["pe"], border_min, border_max);
+        Temp_k = descendant->firstDescendant;
+        Temp_l = descendant->secondDescendant;
+
+        // Step 2: Mutation
+        Temp_k = Individual_Mutation(Temp_k,this->_params["pm"], border_min, border_max);
+        Temp_l = Individual_Mutation(Temp_l,this->_params["pm"], border_min, border_max);
+
+        // Step 3: Add childs to new population
+        New_Population.Individuals.append(Temp_k);
+        New_Population.Individuals.append(Temp_l);
     }
-    return tempPopulation;
+
+    delete [] descendant;
+
+    return New_Population;
 }
 
-PopulationBin Allele::mutation(PopulationBin tempPopulation)
-{
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis( 0, 1 );
-    for (PopulationBin::iterator it = tempPopulation.begin();
-         it != tempPopulation.end(); ++it){
-        for (int i = 0; i < it->first.first.size(); i++){
-            if (dis(gen) < this->_params["Pm"]){
-                if (it->first.first.at(i) == "0")
-                    it->first.first.replace(i,1,"1");
-                else
-                    it->first.first.replace(i,1,"0");
-            }
+// --------------------------------------------------------------------
+
+Allele Allele::Selection(int tournamentGroupSize) {
+
+    Allele temp_population;
+    temp_population.Population_Set_Parameters(Size, this->_params["Lp"], this->_params["pe"], this->_params["pm"]);
+    temp_population.Goal_Functions      = Goal_Functions;
+    temp_population.border_min          = border_min;
+    temp_population.border_max          = border_max;
+
+    temp_population.Population_Clear();
+
+    Population newGroup;
+    Individual bestFromGroup = initOneIndividual( Size, Size, Population_Get_Goal_Functions_Number() );
+
+    for(int i = 0; i < Population_Get_Size(); ++i) {
+
+        newGroup.clear();
+
+        for(int j = 0; j < tournamentGroupSize; ++j) {
+
+            int i = rand() % Population_Get_Size();
+
+            newGroup.append( Individuals[i] );
         }
+        //Setting minimum value for best member
+        bestFromGroup.Fitness = numeric_limits<float>::min();
+
+        for(int k = 0; k < (int)newGroup.size(); ++k ) {
+
+            if( newGroup[k].Fitness >= bestFromGroup.Fitness) bestFromGroup = newGroup[k];
+        }
+
+        temp_population.Population_Set_Individual( bestFromGroup );
     }
-    return tempPopulation;
+
+    return temp_population;
 }
+// --------------------------------------------------------------------
 
-Population Allele::offspringPopulation( Population parentPopulation,
-                                        Borders borders)
-{
-    PopulationBin populationBin = this->populationToBin( parentPopulation,
-                                                         borders);
-    PopulationBin crossedPopulation = this->crossing( populationBin );
-    PopulationBin mutatedPopulation = this->mutation( crossedPopulation );
-    Population offspringPopulation = this->binToPopulation( mutatedPopulation,
-                                                            borders);
-    return offspringPopulation;
-}
+Allele Allele::Population_Delete_Return_NonDom() {
 
-bool checkIfAdjusted(const Individual &i1, const Borders &borders)
-{
-    Genotype tempGenotype = i1.first;
-    for (int i = 0; i < tempGenotype.size(); i++){
-        if (tempGenotype[i] < borders[i].first){
-            return false;
-        }
-        if (tempGenotype[i] > borders[i].second){
-            return false;
-        }
-    }
-    return true;
-}
+    Allele Non_Dominated;
+    Non_Dominated.Population_Set_Parameters( Size, this->_params["Lp"], this->_params["pe"], this->_params["pm"]);
+    Non_Dominated.Goal_Functions        = Goal_Functions;
+    Non_Dominated.border_min            = border_min;
+    Non_Dominated.border_max            = border_max;
 
-bool compareCrowding(const Individual &i1, const Individual &i2)
-{
-    return i1.second["crowding"] > i2.second["crowding"];
-}
+    Non_Dominated.Population_Clear();
 
-int secondMinValue(QVector<int> counters)
-{
-    int minValue = std::numeric_limits<int>::max();
-    for (int i = 0; i < counters.size(); i++){
-        if (counters[i] < minValue && counters[i] != -1){
-            minValue = counters[i];
-        }
-    }
-    return minValue;
-}
+    Population Dom_Individuals;
 
-inline bool checkIfTheSame(const Individual &i1, const Individual &i2)
-{
-    for (int i = 0; i < i1.first.size(); i++){
-        if (i1.first[i] != i2.first[i]) return false;
-    }
-    return true;
-}
+    for(int i = 0; i < (int)Individuals.size(); ++i) {
 
-Population Allele::frontedPopulation(Population t_population, FunctionParser &f1, FunctionParser &f2, Borders borders)
-{
-    int pop_size = t_population.size();
-    //Calculating counters and dominated objects for each element of population
-    Population fronted_population;
+        Individual I_Temp = Individuals[i];
 
-    //Calculating dependanties
-    threadOperations *threadProcess = new threadOperations(t_population,
-                                                           this->_functionsPostures);
-    std::thread tw1 = threadProcess->parallelFunctionThread1();
-    std::thread tw2 = threadProcess->parallelFunctionThread2();
-    std::thread tw3 = threadProcess->parallelFunctionThread3();
-    std::thread tw4 = threadProcess->parallelFunctionThread4();
+        bool isNonDom = true;
 
-    tw1.join();
-    tw2.join();
-    tw3.join();
-    tw4.join();
+        for(int j = 0; j < (int)Individuals.size(); ++j) {
 
-    QVector<QVector<int>> dominated = threadProcess->returnDominated();
-    QVector<int> counters = threadProcess->returnCounters();
-    delete threadProcess;
+            Individual J_Temp = Individuals[j];
 
-    int front = 1;
-    int last_front_size = 0;
-    int minValue = 0;
+            if( I_Temp > J_Temp ) {
 
-    //Calculating fronts and taking exact amount of fronts
-    while(1)
-    {
-        last_front_size = fronted_population.size();
-        minValue = secondMinValue(counters);
-        for(int i = 0; i < pop_size; ++i)
-        {
-            if(counters[i] == minValue){
-                if (checkIfAdjusted(t_population[i], borders)){
-                    fronted_population.append(t_population[i]);
-                    fronted_population.last().second["rank"] = front;
-                    fronted_population.last().second["crowding"] = 0.0;
-                }
-
-                for( auto j : dominated[i]){
-                                    --counters[j];
-                                }
-
-                counters[i] = -1;
-            }
-        }
-        front++;
-        if(fronted_population.size() >= (t_population.size()/2)) break;
-    }
-
-    //Assertion due to a mutation to rebuild
-    //assert(fronted_population.size() >= (t_population.size()/2) && "Too small population due to a mutation");
-
-    Population last_front(fronted_population.mid(last_front_size));
-    if(fronted_population.size() > t_population.size()/2)
-    {
-        Population temp_pop = calculateCrowding(last_front, f1, f2);
-        std::sort(temp_pop.begin(),temp_pop.end(),compareCrowding);
-        int j = 0;
-        for( int i = last_front_size; i < pop_size/2; ++i)
-        {
-            fronted_population.replace(i, temp_pop[j]);
-            ++j;
-        }
-
-        fronted_population.remove( pop_size/2 , fronted_population.size() - (t_population.size()/2) );
-    }
-
-    return fronted_population;
-    }
-
-double NSGA_Split_Function(Individual I1, Individual I2, int alpha, double sigma, FunctionParser &f1, FunctionParser &f2)
-{
-    double d_ij = 0;
-    double sd_ij = 0;
-    d_ij = pow((f1.getValue(I1.first)-f1.getValue(I2.first)),2);
-    d_ij += pow((f2.getValue(I1.first)-f2.getValue(I2.first)),2);
-    d_ij = sqrt(d_ij);
-
-    if (d_ij < sigma){
-        sd_ij = 1 - pow((d_ij/sigma),alpha);
-    }
-    else {
-        sd_ij = 0;
-    }
-    return sd_ij;
-}
-
-Population Allele::calculateCrowding(Population &t_population, FunctionParser &f1, FunctionParser &f2)
-{
-    Population OutputPopulation;
-    //Creating vector of fronts -- the size = number of crowding distance main loops
-    QVector<int> fronts;
-    auto assignFront = [&](const Individual& singleIndividual) {
-        int temp_rank = singleIndividual.second["rank"];
-        if (std::find(fronts.begin(), fronts.end(), temp_rank) == fronts.end()) {
-            fronts.append(temp_rank);
-        }
-    };
-    std::for_each(t_population.begin(),t_population.end(),assignFront);
-    int frontsIter = fronts.size();
-
-    //Main Loop of Crowding Distance for each front
-    int mainLoopIter = 0;
-    while (mainLoopIter < frontsIter) {
-        //Numbe of front -- fronts[mainLoopIter];
-        //Getting all of elements in current front fronts[mainLoopIter]
-        Population currentFront;
-        for (int i = 0; i < t_population.size(); i++){
-            if (t_population[i].second["rank"] == fronts[mainLoopIter]){
-                t_population[i].second["crowding"] = 100000;
-                currentFront.append(t_population[i]);
-            }
-        }
-        //Now currentFront holds all of Individuals from one front
-        //Getting values of functions for current front
-        double sigma = 0.01;
-        int alpha = 1;
-        for (int i = 0; i < currentFront.size(); i++){
-            Individual I_temp = currentFront[i];
-            int distanceSum = 0;
-            for (int j = 0; j < currentFront.size(); j++){
-                Individual J_temp = currentFront[j];
-                if (i != j){
-                    distanceSum += NSGA_Split_Function(I_temp,J_temp,alpha,sigma, f1, f2);
-                }
-            }
-            if (distanceSum != 0){
-                currentFront[i].second["crowding"] = currentFront[i].second["crowding"] / distanceSum;
+                isNonDom = false;
+                break;
             }
         }
 
-        //Sorting is not urgent
-        //Copying to output population
-        for (int i = 0; i < currentFront.size(); i++){
-            OutputPopulation.append(currentFront[i]);
+        if( isNonDom ) {
+
+            Non_Dominated.Population_Set_Individual( I_Temp );
         }
-        //Clearing currentFront for next Loop
-        currentFront.clear();
-        ++mainLoopIter;
+        else {
+
+            Dom_Individuals.append( I_Temp );
+        }
     }
-    return OutputPopulation;
+
+    Individuals = Dom_Individuals;
+
+    return Non_Dominated;
 }

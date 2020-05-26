@@ -25,7 +25,11 @@ private:
     void fillPicList();
 
 signals:
-    void ok_clicked(QString, QString);
+    void ok_clicked(QString,
+                    QString,
+                    int,
+                    QVector<double>,
+                    QVector<double>);
 
 public slots:
     void sendFunctionToMain();
